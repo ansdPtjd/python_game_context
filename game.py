@@ -95,6 +95,9 @@ plants_seat = data.get("plants_seat", [])
 game_font = pygame.font.Font(pixel_pont_path, 100)
 gameover_font = pygame.font.Font(pixel_pont_path, 100)
 inventory_font = pygame.font.Font(pixel_pont_path, 25)
+UI_font = pygame.font.Font(pixel_pont_path, 50)
+press_button = 0
+UI_text = gameover_font.render(str("Press {0}".format(str(press_button))), True, (0, 0, 0))
 gameover_text = gameover_font.render(str("[피로도에 의해 캐릭터가 기절했습니다.]"), True, (255, 0, 0)) # 검은색
 
 # 리스트
@@ -299,6 +302,11 @@ while running:
         fish_point = 0
         cul4 = 250
         while cul > 0:
+            if -520 - field_num[0] * 100 < background_x_pos < -520 and 2150 - field_num[1] * 100 < background_y_pos < 2125:
+                press_button = 'l;,,.space bar'
+                UI_text = UI_font.render(str("Press {0} button".format(str(press_button))), True, (0, 0, 0))
+                screen.blit(UI_text, (character_x_pos + 50, character_y_pos))
+
             screen.blit(background_reset, (0,0))
             screen.blit(background, (background_x_pos, background_y_pos))
             screen.blit(background, (background_x_pos, background_y_pos - background_height))
@@ -463,6 +471,11 @@ while running:
                             if field_num[0] * 500 <= coin:
                                 coin -= field_num[1] * 500
                                 field_num[1] += 1
+
+    if -520 - field_num[0] * 100 < background_x_pos < -520 and 2150 - field_num[1] * 100 < background_y_pos < 2125:
+        press_button = 1
+        UI_text = UI_font.render(str("Press {0} button".format(str(press_button))), True, (0, 0, 0))
+        screen.blit(UI_text, (character_x_pos + 50, character_y_pos))
 
     screen.blit(coin_png, (1550,10)) # 코인 그리기
     screen.blit(coin_text, (1650,20)) # 코인 갯수 표시
