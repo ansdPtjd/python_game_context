@@ -1,6 +1,0 @@
-coin = 500
-seed = 0
-field_x = 3
-field_y = 3
-fish = 0
-flower = 0

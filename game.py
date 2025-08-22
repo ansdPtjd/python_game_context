@@ -1,39 +1,45 @@
-# 게임 배경 크기 3960*2160 4개
-# 캐릭터 크기 30*50
 import os
 import pygame
 import time
 import random
+import sys
+import json
+
 ##############################################################
 # 기본 초기화 (반드시 해야 하는 것들)
+
+def resource_path(relative_path):
+    """실행 환경에 상관없이 리소스의 절대 경로를 반환한다."""
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+# pygame 초기화
 pygame.init()
 
 # 화면 크기 설정
-screen_width = 1980 # 가로 크기
-screen_height = 1080 # 세로 크기
+screen_width = 1980  # 가로 크기
+screen_height = 1080  # 세로 크기
 screen = pygame.display.set_mode((screen_width, screen_height))
 
 # 화면 타이틀 설정
 pygame.display.set_caption("힐링 게임")
 
-# FPS
+# FPS 관리를 위한 시계 객체
 clock = pygame.time.Clock()
 ##############################################################
 
 # 1. 사용자 게임 초기화 (배경 화면, 게임 이미지, 좌표, 속도, 폰트 등)
-py_path = os.path.dirname(__file__) # 현재 파일의 위치 반환 
+py_path = resource_path(os.path.dirname(__file__))  # 현재 파일의 위치 반환
 image_path = str(py_path + r'/image')
 save_path = (py_path + r'/save')
 font_path = (py_path + r'/Font')
 music_path = (py_path + r'/music')
 pixel_pont_path = str(font_path + r'/neodgm.ttf')
-coin_path = str(save_path + r'/coin.txt')
-seed_path = str(save_path + r'/seed.txt')
-flower_path = str(save_path + r'/flower.txt')
-fish_path = str(save_path + r'/fish.txt')
-field_x_path = str(save_path + r'/field_x.txt')
-field_y_path = str(save_path + r'/field_y.txt')
-flower_time = str(save_path + r'/flower_time.txt')
+save_file = str(save_path + r'/save_data.json')
 
 # 이미지 로드
 background = pygame.image.load(os.path.join(image_path, "background.png"))
@@ -66,31 +72,30 @@ store_ESC = pygame.image.load(os.path.join(image_path, "ESC.png"))
 store_UI_buy = pygame.image.load(os.path.join(image_path, "store_UI_buy.png"))
 store_UI_sell = pygame.image.load(os.path.join(image_path, "store_UI_sell.png"))
 store_UI = pygame.image.load(os.path.join(image_path, "store_ui.png"))
-press = pygame.image.load(os.path.join(image_path, "press.png")) 
+press = pygame.image.load(os.path.join(image_path, "press.png"))
 
 # 저장 내용 불러오기
-with open (field_x_path, "r", encoding="utf8") as f:
-    field_x = int(f.read())
-with open (field_y_path, "r", encoding="utf8") as f:
-    field_y = int(f.read())
-with open (seed_path, "r", encoding="utf8") as f:
-    seed = int(f.read())
-with open (flower_path, "r", encoding="utf8") as f:
-    flower = int(f.read())
-with open (fish_path, "r", encoding="utf8") as f:
-    fish = int(f.read())
-with open (coin_path, "r", encoding="utf8") as f:
-    coin = float(f.read())
-    coin = int(coin)
+if os.path.exists(save_file):
+    with open(save_file, "r", encoding="utf8") as f:
+        data = json.load(f)
+else:
+    data = {}
+
+field_x = int(data.get("field_x", 0))
+field_y = int(data.get("field_y", 0))
+seed = int(data.get("seed", 0))
+flower = int(data.get("flower", 0))
+fish = int(data.get("fish", 0))
+coin = int(data.get("coin", 0))
+hp = int(data.get("hp", 0))
+plants_time = data.get("plants_time", [])
+plants_seat = data.get("plants_seat", [])
 
 # Font 정의
 game_font = pygame.font.Font(pixel_pont_path, 100)
 gameover_font = pygame.font.Font(pixel_pont_path, 100)
 inventory_font = pygame.font.Font(pixel_pont_path, 25)
-UI_font = pygame.font.Font(pixel_pont_path, 50)
-gameover_text = gameover_font.render(str("[피로도에 의해 캐릭터가 기절했습니다.]"), True, (255, 0, 0))
-press_button = 0
-UI_text = gameover_font.render(str("Press {0}".format(str(press_button))), True, (0, 0, 0))
+gameover_text = gameover_font.render(str("[피로도에 의해 캐릭터가 기절했습니다.]"), True, (255, 0, 0)) # 검은색
 
 # 리스트
 field_num = [field_x,field_y]
@@ -129,21 +134,20 @@ fish_ran = 0
 gameover_sig = 0
 store_jud = 0
 maxhp = 100
-hp = 100
 to_x = 0
 to_y = 0
 background_speed = 1
 
-
 # 배경음악
-# background_sound = pygame.mixer.Sound(os.path.join(music_path, "background.mp3"))
-# background_sound.play(-1)
+# 배경음악 로드 및 반복 재생
+background_sound = pygame.mixer.Sound(os.path.join(music_path, "background.mp3"))
+background_sound.play(-1)
 
+# 메인 게임 루프
 running = True
 while running:
-    dt = clock.tick(144)  # FPS 설정
+    dt = clock.tick(144)  # FPS 설정 및 시간 기반 처리
     coin_text = game_font.render(str(coin), True, (255, 255, 255))
-    print(background_y_pos)
 
     # 식물 성장 시간 업데이트
     for i in range(len(plants_time)):
@@ -165,16 +169,16 @@ while running:
     for i in range(3):
         inventory_text[i] = inventory_font.render(str(inventory[i]), True, (255, 255, 255))
 
-        
     # 2. 이벤트 처리 (키보드, 마우스 등)
     cul = 0
+    # 발생한 모든 이벤트를 순회하며 처리
     for event in pygame.event.get():  # 이벤트가 진행중인가?
         if event.type == pygame.QUIT:  # 이벤트가 QUIT인가
             running = False
 
         if event.type == pygame.KEYDOWN:  # 키가 눌러졌는지 확인
             hp -= 0.01  # 체력 감소
-            
+
             # 캐릭터 이동
             if event.key == pygame.K_a:  # 캐릭터를 왼쪽으로
                 to_x += background_speed
@@ -184,10 +188,10 @@ while running:
                 to_y += background_speed
             elif event.key == pygame.K_s:  # 캐릭터를 아래로
                 to_y -= background_speed
-            
+
             # 꽃 심기
             if event.key == pygame.K_1:
-                if -520 - field_num[0] * 100 < background_x_pos < -520 and 2150 - field_num[1] * 100 < background_y_pos < 2125:
+                if -520 - field_num[0] * 100 < background_x_pos < -520 and 1855 - field_num[1] * 100 < background_y_pos < 2125:
                     if inventory[0] > 0:
                         for cul in range(field_num[0] * field_num[1]):
                             if plants_seat[cul] == 0:  # 현재 좌석이 비어있다면
@@ -204,15 +208,15 @@ while running:
             if event.key == pygame.K_f:
                 if background_y_pos < -900:
                     fish = 1
-                elif -365 < background_x_pos < -225 and background_y_pos >= 2100:
+                elif -365 < background_x_pos < -225:
                     store_jud = 1
-            
+
             # 체력 회복 아이템 사용
             if event.key == pygame.K_2:
                 if inventory[1] >= 1 and hp < 100:
                     hp += 1
                     inventory[1] -= 1
-                    
+
             elif event.key == pygame.K_3:  # 추가적인 체력 회복
                 if inventory[2] >= 1 and hp < 100:
                     hp += 2
@@ -257,7 +261,7 @@ while running:
             index = d * field_num[0] + e
             x_position = background_x_pos + 1500 + e * 105
             y_position = background_y_pos - background_height + 600 + d * 100
-            
+
             if plants_seat[index] == 1:
                 if plants_time[index] > 1000:
                     screen.blit(flower_dic, (x_position, y_position))
@@ -267,7 +271,7 @@ while running:
                     screen.blit(flower_dic3, (x_position, y_position))
                 else:
                     screen.blit(flower_dic4, (x_position, y_position))
-                    
+
                     if (-815 - (field_num[0] - 3) * 110 < background_x_pos < -520 and
                             1855 < background_y_pos < 2125):
                         for a, plant_time in enumerate(plants_time):
@@ -276,12 +280,11 @@ while running:
                                 plants_time[a] = 1_000_000_000  # 오류 방지
                                 inventory[1] += 1
                                 inventory_text[1] = inventory_font.render(str(inventory[1]), True, (255, 255, 255))
-    
+
     screen.blit(character, (character_x_pos, character_y_pos)) # 캐릭터를 그리기
     pygame.draw.rect(screen, (0 ,0 ,0), (character_x_pos - (maxhp / 2.9) , character_y_pos - 30, maxhp, 15)) # hp바 배경
     pygame.draw.rect(screen, (255 ,0 ,0), (character_x_pos - (maxhp / 3.2) , character_y_pos - 27.5, hp - 5, 10)) # hp바 표시
-    
-    
+
     cul4 = 250
     if fish == 1 :
         fish_x_pos = (screen_width / 2) - (character_width / 2)
@@ -296,10 +299,6 @@ while running:
         fish_point = 0
         cul4 = 250
         while cul > 0:
-            if -520 - field_num[0] * 100 < background_x_pos < -520 and 1855 - field_num[1] * 100 < background_y_pos < 2125:
-                press_button = 'l;,,.space bar'
-                UI_text = UI_font.render(str("Press {0} button".format(str(press_button))), True, (0, 0, 0))
-                screen.blit(UI_text, (character_x_pos + 50, character_y_pos))
             screen.blit(background_reset, (0,0))
             screen.blit(background, (background_x_pos, background_y_pos))
             screen.blit(background, (background_x_pos, background_y_pos - background_height))
@@ -321,7 +320,7 @@ while running:
                 fish_x_pul -= 100
             if cul3 > 0:
                 fish_x_pul += 100
-            for event in pygame.event.get(): 
+            for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         if cul4 + fish_x_pul < 520 or cul4 + fish_x_pul >= 1420:
@@ -355,18 +354,18 @@ while running:
         fish = 0
         cul2 = 0
         fish_x_pul = 0
-    
+
     screen.blit(inventory_png, ((screen_width / 2) - (character_width / 2) - 630, screen_height - 140))
     screen.blit(seed_png, ((screen_width / 2) - (character_width / 2) - 630 + 15, 0 + screen_height - 120))
     screen.blit(flower_png, ((screen_width / 2) - (character_width / 2) - 630 + 140, 0 + screen_height - 120))
-    screen.blit(fish_png, ((screen_width / 2) - (character_width / 2) - 630 + 275, 0 + screen_height - 120))    
-    
+    screen.blit(fish_png, ((screen_width / 2) - (character_width / 2) - 630 + 275, 0 + screen_height - 120))
+
     cul = 0
     for i in range(len(inventory_text)):
         x_pos = (screen_width / 2) - (character_width / 2) - 535 + cul * 125
         screen.blit(inventory_text[i], (x_pos, screen_height - 120))
         cul += 1
-    
+
     cul = 0
     if store_jud == 1:
         store_UI_y_pos -= 100
@@ -374,13 +373,13 @@ while running:
         screen.blit(store_ESC, (store_UI_x_pos - store_UI_width / 2, store_UI_y_pos - store_UI_height / 2))
         store_UI_x_pos -= 90
         store_UI_y_pos -= 50
-        
+
         # 아이템 아이콘 표시
         screen.blit(flower_png, (store_UI_x_pos - store_UI_width / 2 + 90, store_UI_y_pos - store_UI_height / 2 + 230))
         screen.blit(seed_png, (store_UI_x_pos - store_UI_width / 2 + 90, store_UI_y_pos - store_UI_height / 2 + 480))
         screen.blit(fish_png, (store_UI_x_pos - store_UI_width / 2 + 90, store_UI_y_pos - store_UI_height / 2 + 730))
         screen.blit(field_png, (store_UI_x_pos - store_UI_width / 2 + 1000, store_UI_y_pos - store_UI_height / 2 + 230))
-        
+
         # 가격 텍스트 생성
         flower_buy_text = inventory_font.render("100 coin", True, (255, 255, 255))
         flower_sell_text = inventory_font.render("90 coin", True, (255, 255, 255))
@@ -390,7 +389,7 @@ while running:
         fish_sell_text = inventory_font.render("250 coin", True, (255, 255, 255))
         field_price = str(field_num[1] * 500) + " coin"
         field_buy_text = inventory_font.render(field_price, True, (255, 255, 255))
-        
+
         # 구매 및 판매 UI 그리기
         for i in range(3):  # 꽃, 씨앗, 물고기
             screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
@@ -420,7 +419,7 @@ while running:
                 if store_UI_x_pos - store_UI_width / 2 < pygame.mouse.get_pos()[0] < store_UI_x_pos - store_UI_width / 2 + 100:
                     if store_UI_y_pos - store_UI_height / 2 - 100 < pygame.mouse.get_pos()[1] < store_UI_y_pos - store_UI_height / 2:
                         store_jud = 0
-                
+
                 # 아이템 구매 및 판매 처리
                 for cul in range(3):  # 0: 꽃, 1: 씨앗, 2: 물고기
                     if 290 < pygame.mouse.get_pos()[0] < 590:  # buy 영역
@@ -437,7 +436,7 @@ while running:
                                 if coin >= 300:
                                     inventory[2] += 1
                                     coin -= 300
-                    
+
                     elif 600 < pygame.mouse.get_pos()[0] < 900:  # sell 영역
                         if cul * 250 + 200 < pygame.mouse.get_pos()[1] < cul * 250 + 350:
                             if cul == 0:  # 꽃
@@ -465,14 +464,9 @@ while running:
                                 coin -= field_num[1] * 500
                                 field_num[1] += 1
 
-    if -520 - field_num[0] * 100 < background_x_pos < -520 and 2150 - field_num[1] * 100 < background_y_pos < 2125:
-        press_button = 1
-        UI_text = UI_font.render(str("Press {0} button".format(str(press_button))), True, (0, 0, 0))
-        screen.blit(UI_text, (character_x_pos + 50, character_y_pos))
-
     screen.blit(coin_png, (1550,10)) # 코인 그리기
     screen.blit(coin_text, (1650,20)) # 코인 갯수 표시
-    if gameover_sig == 1: # 게임오버가 되었을 때 게임오버 표시
+    if gameover_sig == 1:  # 게임오버가 되었을 때 게임오버 표시
         screen.blit(gameover, (0,0))
         screen.blit(gameover_text, (50, 450))
         hp += 50
@@ -481,17 +475,21 @@ while running:
         time.sleep(3)
         gameover_sig = 0
 
+    # 화면에 그린 모든 내용 표시
     pygame.display.update()
-with open (coin_path, "w", encoding="utf8") as f:
-    f.write(str(coin))
-with open (seed_path, "w", encoding="utf8") as f:
-    f.write(str(inventory[0]))
-with open (flower_path, "w", encoding="utf8") as f:
-    f.write(str(inventory[1]))
-with open (fish_path, "w", encoding="utf8") as f:
-    f.write(str(inventory[2]))
-with open (field_x_path, "w", encoding="utf8") as f:
-    f.write(str(field_num[0]))
-with open (field_y_path, "w", encoding="utf8") as f:
-    f.write(str(field_num[1]))
+
+# 게임 종료 후 정보를 JSON 파일에 저장
+data = {
+    "coin": coin,
+    "seed": inventory[0],
+    "flower": inventory[1],
+    "fish": inventory[2],
+    "field_x": field_num[0],
+    "field_y": field_num[1],
+    "hp" : int(hp),
+    "plants_time": plants_time,
+    "plants_seat": plants_seat,
+}
+with open(save_file, "w", encoding="utf8") as f:
+    json.dump(data, f, ensure_ascii=False)
 pygame.quit() # 게임 종료
