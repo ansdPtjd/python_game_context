@@ -4,18 +4,8 @@ import os
 import pygame
 import time
 import random
-import sys
 ##############################################################
 # 기본 초기화 (반드시 해야 하는 것들)
-import os
-
-def resource_path(relative_path):
-    try:
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
-
-    return os.path.join(base_path, relative_path)
 pygame.init()
 
 # 화면 크기 설정
@@ -31,11 +21,11 @@ clock = pygame.time.Clock()
 ##############################################################
 
 # 1. 사용자 게임 초기화 (배경 화면, 게임 이미지, 좌표, 속도, 폰트 등)
-py_path = resource_path(os.path.dirname(__file__)) # 현재 파일의 위치 반환 
-image_path = str(py_path + r'/image2')
-save_path = (py_path + r'/save2')
-font_path = (py_path + r'/Font2')
-music_path = (py_path + r'/music2')
+py_path = os.path.dirname(__file__) # 현재 파일의 위치 반환 
+image_path = str(py_path + r'/image')
+save_path = (py_path + r'/save')
+font_path = (py_path + r'/Font')
+music_path = (py_path + r'/music')
 pixel_pont_path = str(font_path + r'/neodgm.ttf')
 coin_path = str(save_path + r'/coin.txt')
 seed_path = str(save_path + r'/seed.txt')
@@ -43,6 +33,7 @@ flower_path = str(save_path + r'/flower.txt')
 fish_path = str(save_path + r'/fish.txt')
 field_x_path = str(save_path + r'/field_x.txt')
 field_y_path = str(save_path + r'/field_y.txt')
+flower_time = str(save_path + r'/flower_time.txt')
 
 # 이미지 로드
 background = pygame.image.load(os.path.join(image_path, "background.png"))
@@ -78,25 +69,28 @@ store_UI = pygame.image.load(os.path.join(image_path, "store_ui.png"))
 press = pygame.image.load(os.path.join(image_path, "press.png")) 
 
 # 저장 내용 불러오기
-with open (field_x_path, "r", encoding="utf8") as coin_file:
-    field_x = int(coin_file.read())
-with open (field_y_path, "r", encoding="utf8") as coin_file:
-    field_y = int(coin_file.read())
-with open (seed_path, "r", encoding="utf8") as coin_file:
-    seed = int(coin_file.read())
-with open (flower_path, "r", encoding="utf8") as coin_file:
-    flower = int(coin_file.read())
-with open (fish_path, "r", encoding="utf8") as coin_file:
-    fish = int(coin_file.read())
-with open (coin_path, "r", encoding="utf8") as coin_file:
-    coin = float(coin_file.read())
+with open (field_x_path, "r", encoding="utf8") as f:
+    field_x = int(f.read())
+with open (field_y_path, "r", encoding="utf8") as f:
+    field_y = int(f.read())
+with open (seed_path, "r", encoding="utf8") as f:
+    seed = int(f.read())
+with open (flower_path, "r", encoding="utf8") as f:
+    flower = int(f.read())
+with open (fish_path, "r", encoding="utf8") as f:
+    fish = int(f.read())
+with open (coin_path, "r", encoding="utf8") as f:
+    coin = float(f.read())
     coin = int(coin)
 
 # Font 정의
 game_font = pygame.font.Font(pixel_pont_path, 100)
 gameover_font = pygame.font.Font(pixel_pont_path, 100)
 inventory_font = pygame.font.Font(pixel_pont_path, 25)
-gameover_text = gameover_font.render(str("[피로도에 의해 캐릭터가 기절했습니다.]"), True, (255, 0, 0)) # 검은색
+UI_font = pygame.font.Font(pixel_pont_path, 50)
+gameover_text = gameover_font.render(str("[피로도에 의해 캐릭터가 기절했습니다.]"), True, (255, 0, 0))
+press_button = 0
+UI_text = gameover_font.render(str("Press {0}".format(str(press_button))), True, (0, 0, 0))
 
 # 리스트
 field_num = [field_x,field_y]
@@ -140,14 +134,16 @@ to_x = 0
 to_y = 0
 background_speed = 1
 
+
 # 배경음악
-background_sound = pygame.mixer.Sound(os.path.join(music_path, "background.mp3"))
-background_sound.play(-1)
+# background_sound = pygame.mixer.Sound(os.path.join(music_path, "background.mp3"))
+# background_sound.play(-1)
 
 running = True
 while running:
     dt = clock.tick(144)  # FPS 설정
     coin_text = game_font.render(str(coin), True, (255, 255, 255))
+    print(background_y_pos)
 
     # 식물 성장 시간 업데이트
     for i in range(len(plants_time)):
@@ -191,7 +187,7 @@ while running:
             
             # 꽃 심기
             if event.key == pygame.K_1:
-                if -520 - field_num[0] * 100 < background_x_pos < -520 and 1855 - field_num[1] * 100 < background_y_pos < 2125:
+                if -520 - field_num[0] * 100 < background_x_pos < -520 and 2150 - field_num[1] * 100 < background_y_pos < 2125:
                     if inventory[0] > 0:
                         for cul in range(field_num[0] * field_num[1]):
                             if plants_seat[cul] == 0:  # 현재 좌석이 비어있다면
@@ -208,7 +204,7 @@ while running:
             if event.key == pygame.K_f:
                 if background_y_pos < -900:
                     fish = 1
-                elif -365 < background_x_pos < -225:
+                elif -365 < background_x_pos < -225 and background_y_pos >= 2100:
                     store_jud = 1
             
             # 체력 회복 아이템 사용
@@ -300,6 +296,10 @@ while running:
         fish_point = 0
         cul4 = 250
         while cul > 0:
+            if -520 - field_num[0] * 100 < background_x_pos < -520 and 1855 - field_num[1] * 100 < background_y_pos < 2125:
+                press_button = 'l;,,.space bar'
+                UI_text = UI_font.render(str("Press {0} button".format(str(press_button))), True, (0, 0, 0))
+                screen.blit(UI_text, (character_x_pos + 50, character_y_pos))
             screen.blit(background_reset, (0,0))
             screen.blit(background, (background_x_pos, background_y_pos))
             screen.blit(background, (background_x_pos, background_y_pos - background_height))
@@ -465,7 +465,11 @@ while running:
                                 coin -= field_num[1] * 500
                                 field_num[1] += 1
 
-    
+    if -520 - field_num[0] * 100 < background_x_pos < -520 and 2150 - field_num[1] * 100 < background_y_pos < 2125:
+        press_button = 1
+        UI_text = UI_font.render(str("Press {0} button".format(str(press_button))), True, (0, 0, 0))
+        screen.blit(UI_text, (character_x_pos + 50, character_y_pos))
+
     screen.blit(coin_png, (1550,10)) # 코인 그리기
     screen.blit(coin_text, (1650,20)) # 코인 갯수 표시
     if gameover_sig == 1: # 게임오버가 되었을 때 게임오버 표시
@@ -478,16 +482,16 @@ while running:
         gameover_sig = 0
 
     pygame.display.update()
-with open (coin_path, "w", encoding="utf8") as coin_file:
-    coin_file.write(str(coin))
-with open (seed_path, "w", encoding="utf8") as coin_file:
-    coin_file.write(str(inventory[0]))
-with open (flower_path, "w", encoding="utf8") as coin_file:
-    coin_file.write(str(inventory[1]))
-with open (fish_path, "w", encoding="utf8") as coin_file:
-    coin_file.write(str(inventory[2]))
-with open (field_x_path, "w", encoding="utf8") as coin_file:
-    coin_file.write(str(field_num[0]))
-with open (field_y_path, "w", encoding="utf8") as coin_file:
-    coin_file.write(str(field_num[1]))
+with open (coin_path, "w", encoding="utf8") as f:
+    f.write(str(coin))
+with open (seed_path, "w", encoding="utf8") as f:
+    f.write(str(inventory[0]))
+with open (flower_path, "w", encoding="utf8") as f:
+    f.write(str(inventory[1]))
+with open (fish_path, "w", encoding="utf8") as f:
+    f.write(str(inventory[2]))
+with open (field_x_path, "w", encoding="utf8") as f:
+    f.write(str(field_num[0]))
+with open (field_y_path, "w", encoding="utf8") as f:
+    f.write(str(field_num[1]))
 pygame.quit() # 게임 종료
