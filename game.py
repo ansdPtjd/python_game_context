@@ -151,6 +151,9 @@ background_speed = 1
 worker_3_x_pos = background_x_pos + 1275
 worker_3_y_pos = background_y_pos - 1550
 worker_3_speed = 10
+woker_3_pos_jud = 0
+WORKER_IDX = 0
+woker_3_prev_bucket = None
 
 # 배경음악
 # 배경음악 로드 및 반복 재생
@@ -247,26 +250,47 @@ while running:
     background_x_pos += to_x * dt # FPS가 달라짐에 따라 속도가 변하는 것을 방지
     background_y_pos += to_y * dt
     
-    for i in range(len(worker_3_seed)):
-            if (worker_3_seed[i] == 0 or worker_3_flower[i] >= 3):
-                woker_3_target_x = background_x_pos + 1265
-                woker_3_target_y = background_y_pos - 1550
-            elif (worker_3_seed[i] >= 1):
-                woker_3_target_x = background_x_pos + 1500
-                woker_3_target_y = background_y_pos - 1560
+    i = WORKER_IDX
 
-    if worker_3_x_pos < woker_3_target_x:
-        worker_3_x_pos += worker_3_speed
-    elif worker_3_x_pos > woker_3_target_x:
-        worker_3_x_pos -= worker_3_speed
-    if worker_3_y_pos < woker_3_target_y:
-        worker_3_y_pos += worker_3_speed
-    elif worker_3_y_pos > woker_3_target_y:
-        worker_3_y_pos -= worker_3_speed
+    current_bucket = 0 if (worker_3_seed[i] == 0 or worker_3_flower[i] >= 3) else 1
+    bucket_changed = (woker_3_prev_bucket is not None) and (current_bucket != woker_3_prev_bucket)
+
+    target1_x = background_x_pos + 1265
+    target1_y = background_y_pos - 1550
+    target2_x = background_x_pos + 1500
+    target2_y = background_y_pos - 1560
+
+    if current_bucket == 0:
+        target_x, target_y = target1_x, target1_y
+    else:
+        target_x, target_y = target2_x, target2_y
+
+    if bucket_changed:
+        woker_3_target_x = target_x
+        woker_3_target_y = target_y
+        woker_3_pos_jud = 1
+    else:
+        arrived = (-10 < (worker_3_x_pos - target_x) < 10) and (-10 < (worker_3_y_pos - target_y) < 10)
+        if arrived:
+            woker_3_pos_jud = 0
+        elif woker_3_pos_jud != 1:
+            woker_3_pos_jud = 0
+
+    if woker_3_pos_jud == 1:
+        if worker_3_x_pos < woker_3_target_x:
+            worker_3_x_pos += worker_3_speed
+        elif worker_3_x_pos > woker_3_target_x:
+            worker_3_x_pos -= worker_3_speed
+        if worker_3_y_pos < woker_3_target_y:
+            worker_3_y_pos += worker_3_speed
+        elif worker_3_y_pos > woker_3_target_y:
+            worker_3_y_pos -= worker_3_speed
+
+    woker_3_prev_bucket = current_bucket
+
 
     worker_3_x_pos += to_x * dt
     worker_3_y_pos += to_y * dt
-    print(woker_3_target_x, woker_3_target_y, worker_3_x_pos, worker_3_y_pos)
         
 
     # 3. 게임 배경 위치 정의
