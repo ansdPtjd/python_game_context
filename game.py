@@ -73,6 +73,10 @@ store_UI_buy = pygame.image.load(os.path.join(image_path, "store_UI_buy.png"))
 store_UI_sell = pygame.image.load(os.path.join(image_path, "store_UI_sell.png"))
 store_UI = pygame.image.load(os.path.join(image_path, "store_ui.png"))
 press = pygame.image.load(os.path.join(image_path, "press.png"))
+worker_3 = pygame.image.load(os.path.join(image_path, "worker_3.png"))
+
+#이미지 크기
+worker_UI = pygame.transform.scale(worker_3, (worker_3.get_width() * 2, worker_3.get_height() *2))
 
 # 저장 내용 불러오기
 if os.path.exists(save_file):
@@ -90,6 +94,7 @@ coin = int(data.get("coin", 0))
 hp = int(data.get("hp", 0))
 plants_time = data.get("plants_time", [])
 plants_seat = data.get("plants_seat", [])
+worker_3_jud = data.get("worker_3_jud", 0)
 
 # Font 정의
 game_font = pygame.font.Font(pixel_pont_path, 100)
@@ -102,8 +107,6 @@ gameover_text = gameover_font.render(str("[피로도에 의해 캐릭터가 기�
 
 # 리스트
 field_num = [field_x,field_y]
-plants_time = []
-plants_seat = []
 inventory = [seed, flower, fish, 0, 0, 0, 0, 0, 0] # 꽃 씨앗, 꽃, 물고기
 inventory_text = []
 inventory_text.append(inventory_font.render(str(5), True, (255, 255, 255)))
@@ -116,6 +119,8 @@ character_width = character_size[0]
 character_height = character_size[1]
 character_x_pos = (screen_width / 2) - (character_width / 2)
 character_y_pos = (screen_height / 2) + (character_height / 2)
+# worker_3_x_pos = (screen_width / 2) - (character_width / 2)
+# worker_3_y_pos = (screen_height / 2) + (character_height / 2)
 store_UI_x_pos = (screen_width / 2) - (character_width / 2)
 store_UI_y_pos = (screen_height / 2) + (character_height / 2)
 store_UI_size = store_UI.get_rect().size
@@ -136,6 +141,7 @@ fish_point = 0
 fish_ran = 0
 gameover_sig = 0
 store_jud = 0
+work_jud = 0
 maxhp = 100
 to_x = 0
 to_y = 0
@@ -151,7 +157,7 @@ running = True
 while running:
     dt = clock.tick(144)  # FPS 설정 및 시간 기반 처리
     coin_text = game_font.render(str(coin), True, (255, 255, 255))
-
+    
     # 식물 성장 시간 업데이트
     for i in range(len(plants_time)):
         if plants_time[i] > 3:
@@ -211,8 +217,10 @@ while running:
             if event.key == pygame.K_f:
                 if background_y_pos < -900:
                     fish = 1
-                elif -365 < background_x_pos < -225:
+                elif -365 < background_x_pos < -225 and background_y_pos> 2150:
                     store_jud = 1
+                elif -665 < background_x_pos < 525 and background_y_pos> 2150:
+                    work_jud = 1
 
             # 체력 회복 아이템 사용
             if event.key == pygame.K_2:
@@ -254,6 +262,8 @@ while running:
     screen.blit(house, (background_x_pos + 865, background_y_pos - 1800)) # 집 그리기
     screen.blit(sand2, (background_x_pos + 1165, background_y_pos - 1800))
     screen.blit(store, (background_x_pos + 1165, background_y_pos - 1800)) # 가게 그리기
+    screen.blit(sand2, (background_x_pos + 1465, background_y_pos - 1800))
+    screen.blit(store, (background_x_pos + 1465, background_y_pos - 1800))
 
     for d in range(field_num[1]):  # 밭 그리기
         for e in range(field_num[0]):
@@ -284,9 +294,14 @@ while running:
                                 inventory[1] += 1
                                 inventory_text[1] = inventory_font.render(str(inventory[1]), True, (255, 255, 255))
 
+    if (worker_3_jud == 1):
+        screen.blit(worker_3, (background_x_pos + 1275, background_y_pos - 1550))
+
     screen.blit(character, (character_x_pos, character_y_pos)) # 캐릭터를 그리기
     pygame.draw.rect(screen, (0 ,0 ,0), (character_x_pos - (maxhp / 2.9) , character_y_pos - 30, maxhp, 15)) # hp바 배경
     pygame.draw.rect(screen, (255 ,0 ,0), (character_x_pos - (maxhp / 3.2) , character_y_pos - 27.5, hp - 5, 10)) # hp바 표시
+
+    
 
     cul4 = 250
     if fish == 1 :
@@ -303,10 +318,11 @@ while running:
         cul4 = 250
         while cul > 0:
             if -520 - field_num[0] * 100 < background_x_pos < -520 and 2150 - field_num[1] * 100 < background_y_pos < 2125:
-                press_button = 'l;,,.space bar'
+                press_button = 'space bar'
                 UI_text = UI_font.render(str("Press {0} button".format(str(press_button))), True, (0, 0, 0))
                 screen.blit(UI_text, (character_x_pos + 50, character_y_pos))
 
+            print(cul)
             screen.blit(background_reset, (0,0))
             screen.blit(background, (background_x_pos, background_y_pos))
             screen.blit(background, (background_x_pos, background_y_pos - background_height))
@@ -472,6 +488,85 @@ while running:
                                 coin -= field_num[1] * 500
                                 field_num[1] += 1
 
+    # 일 
+    if work_jud == 1:
+        store_UI_y_pos -= 100
+        screen.blit(store_UI, (store_UI_x_pos - store_UI_width / 2, store_UI_y_pos - store_UI_height / 2))
+        screen.blit(store_ESC, (store_UI_x_pos - store_UI_width / 2, store_UI_y_pos - store_UI_height / 2))
+        store_UI_x_pos -= 90
+        store_UI_y_pos -= 50
+
+        # 아이템 아이콘 표시
+        screen.blit(worker_UI, (store_UI_x_pos - store_UI_width / 2 + 115, store_UI_y_pos - store_UI_height / 2 + 230))
+
+        # 가격 텍스트 생성
+        worker_3_buy = inventory_font.render("1000 coin", True, (255, 255, 255))
+        worker_3_sell = inventory_font.render("100 coin", True, (255, 255, 255))
+        # seed_buy_text = inventory_font.render("10 coin", True, (255, 255, 255))
+        # seed_sell_text = inventory_font.render("5 coin", True, (255, 255, 255))
+        # fish_buy_text = inventory_font.render("300 coin", True, (255, 255, 255))
+        # fish_sell_text = inventory_font.render("250 coin", True, (255, 255, 255))
+
+
+        # 구매 및 판매 UI 그리기
+        for i in range(1):
+            screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
+            screen.blit(store_UI_sell, (store_UI_x_pos - store_UI_width / 2 + 500, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
+            cul += 1
+        cul = 0
+
+        # 가격 텍스트 표시
+        screen.blit(worker_3_buy, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 180))
+        screen.blit(worker_3_sell, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 180))
+        # screen.blit(seed_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 200 + 230))
+        # screen.blit(seed_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 200 + 230))
+        # screen.blit(fish_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 200 + 480))
+        # screen.blit(fish_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 200 + 480))
+        # screen.blit(field_buy_text, (store_UI_x_pos - store_UI_width / 2 + 1210, store_UI_y_pos - store_UI_height / 2 + 180))
+
+        # UI 위치 초기화
+        store_UI_x_pos = 975
+        store_UI_y_pos = 575
+
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:  # 마우스 클릭 누를 때
+                # 워크 UI 클릭 감지
+                if store_UI_x_pos - store_UI_width / 2 < pygame.mouse.get_pos()[0] < store_UI_x_pos - store_UI_width / 2 + 100:
+                    if store_UI_y_pos - store_UI_height / 2 - 100 < pygame.mouse.get_pos()[1] < store_UI_y_pos - store_UI_height / 2:
+                        work_jud = 0
+
+                # 아이템 구매 및 판매 처리
+                for cul in range(3):
+                    if 290 < pygame.mouse.get_pos()[0] < 590:  # buy 영역
+                        if cul * 250 + 200 < pygame.mouse.get_pos()[1] < cul * 250 + 350:
+                            if cul == 0: 
+                                if coin >= 1000:
+                                    worker_3_jud = 1
+                                    coin -= 1000
+                            # elif cul == 1:  # 씨앗
+                            #     if coin >= 10:
+                            #         inventory[0] += 1
+                            #         coin -= 10
+                            # elif cul == 2:  # 물고기
+                            #     if coin >= 300:
+                            #         inventory[2] += 1
+                            #         coin -= 300
+
+                    elif 600 < pygame.mouse.get_pos()[0] < 900:  # sell 영역
+                        if cul * 250 + 200 < pygame.mouse.get_pos()[1] < cul * 250 + 350:
+                            if cul == 0:
+                                if worker_3_jud == 1:
+                                    worker_3_jud = 0
+                                    coin += 100
+                            # elif cul == 1:  # 씨앗
+                            #     if inventory[0] >= 1:
+                            #         inventory[0] -= 1
+                            #         coin += 5
+                            # elif cul == 2:  # 물고기
+                            #     if inventory[2] >= 1:
+                            #         inventory[2] -= 1
+                            #         coin += 250
+
     if -520 - field_num[0] * 100 < background_x_pos < -520 and 2150 - field_num[1] * 100 < background_y_pos < 2125:
         press_button = 1
         UI_text = UI_font.render(str("Press {0} button".format(str(press_button))), True, (0, 0, 0))
@@ -502,7 +597,8 @@ data = {
     "hp" : int(hp),
     "plants_time": plants_time,
     "plants_seat": plants_seat,
+    "worker_3_jud" : worker_3_jud
 }
 with open(save_file, "w", encoding="utf8") as f:
-    json.dump(data, f, ensure_ascii=False)
+    json.dump(data, f, ensure_ascii=False, indent=4)
 pygame.quit() # 게임 종료
