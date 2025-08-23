@@ -148,8 +148,8 @@ maxhp = 100
 to_x = 0
 to_y = 0
 background_speed = 1
-worker_3_x_pos = background_x_pos + 1275
-worker_3_y_pos = background_y_pos - 1550
+worker_3_world_x = 1500
+worker_3_world_y = -1550
 worker_3_speed = 10
 woker_3_pos_jud = 0
 WORKER_IDX = 0
@@ -253,45 +253,44 @@ while running:
     i = WORKER_IDX
 
     current_bucket = 0 if (worker_3_seed[i] == 0 or worker_3_flower[i] >= 3) else 1
-    bucket_changed = (woker_3_prev_bucket is not None) and (current_bucket != woker_3_prev_bucket)
 
-    target1_x = background_x_pos + 1265
-    target1_y = background_y_pos - 1550
-    target2_x = background_x_pos + 1500
-    target2_y = background_y_pos - 1560
 
-    if current_bucket == 0:
-        target_x, target_y = target1_x, target1_y
-    else:
-        target_x, target_y = target2_x, target2_y
+    is_first = (woker_3_prev_bucket is None)
+    bucket_changed = is_first or (current_bucket != woker_3_prev_bucket)
 
-    if bucket_changed:
-        woker_3_target_x = target_x
-        woker_3_target_y = target_y
+    target1_x, target1_y = 1265, -1550
+    target2_x, target2_y = 1500, -1560
+    target_x, target_y = (target1_x, target1_y) if current_bucket == 0 else (target2_x, target2_y)
+
+    woker_3_target_x = target_x
+    woker_3_target_y = target_y
+
+    arrived = (-10 < (worker_3_world_x - woker_3_target_x) < 10) and (-10 < (worker_3_world_y - woker_3_target_y) < 10)
+
+    if bucket_changed or (not arrived):
         woker_3_pos_jud = 1
     else:
-        arrived = (-10 < (worker_3_x_pos - target_x) < 10) and (-10 < (worker_3_y_pos - target_y) < 10)
-        if arrived:
-            woker_3_pos_jud = 0
-        elif woker_3_pos_jud != 1:
-            woker_3_pos_jud = 0
+        woker_3_pos_jud = 0
 
     if woker_3_pos_jud == 1:
-        if worker_3_x_pos < woker_3_target_x:
-            worker_3_x_pos += worker_3_speed
-        elif worker_3_x_pos > woker_3_target_x:
-            worker_3_x_pos -= worker_3_speed
-        if worker_3_y_pos < woker_3_target_y:
-            worker_3_y_pos += worker_3_speed
-        elif worker_3_y_pos > woker_3_target_y:
-            worker_3_y_pos -= worker_3_speed
+        if worker_3_world_x < woker_3_target_x:
+            worker_3_world_x += worker_3_speed
+        elif worker_3_world_x > woker_3_target_x:
+            worker_3_world_x -= worker_3_speed
+
+        if worker_3_world_y < woker_3_target_y:
+            worker_3_world_y += worker_3_speed
+        elif worker_3_world_y > woker_3_target_y:
+            worker_3_world_y -= worker_3_speed
+
 
     woker_3_prev_bucket = current_bucket
 
+    if (worker_3_jud == 1):
+        worker_3_screen_x = background_x_pos + worker_3_world_x
+        worker_3_screen_y = background_y_pos + worker_3_world_y
 
-    worker_3_x_pos += to_x * dt
-    worker_3_y_pos += to_y * dt
-        
+
 
     # 3. 게임 배경 위치 정의
     # 배경 X 좌표 제한
@@ -346,7 +345,7 @@ while running:
                                 inventory_text[1] = inventory_font.render(str(inventory[1]), True, (255, 255, 255))
 
     if (worker_3_jud == 1):
-        screen.blit(worker_3, (worker_3_x_pos, worker_3_y_pos))
+        screen.blit(worker_3, (worker_3_screen_x, worker_3_screen_y))
 
     screen.blit(character, (character_x_pos, character_y_pos)) # 캐릭터를 그리기
     pygame.draw.rect(screen, (0 ,0 ,0), (character_x_pos - (maxhp / 2.9) , character_y_pos - 30, maxhp, 15)) # hp바 배경
