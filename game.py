@@ -95,6 +95,8 @@ hp = int(data.get("hp", 0))
 plants_time = data.get("plants_time", [])
 plants_seat = data.get("plants_seat", [])
 worker_3_jud = data.get("worker_3_jud", 0)
+worker_3_seed = data.get("worker_3_seed", [])
+worker_3_flower = data.get("worker_3_flower", [])
 
 # Font 정의
 game_font = pygame.font.Font(pixel_pont_path, 100)
@@ -146,6 +148,9 @@ maxhp = 100
 to_x = 0
 to_y = 0
 background_speed = 1
+worker_3_x_pos = background_x_pos + 1275
+worker_3_y_pos = background_y_pos - 1550
+worker_3_speed = 10
 
 # 배경음악
 # 배경음악 로드 및 반복 재생
@@ -241,6 +246,28 @@ while running:
 
     background_x_pos += to_x * dt # FPS가 달라짐에 따라 속도가 변하는 것을 방지
     background_y_pos += to_y * dt
+    
+    for i in range(len(worker_3_seed)):
+            if (worker_3_seed[i] == 0 or worker_3_flower[i] >= 3):
+                woker_3_target_x = background_x_pos + 1265
+                woker_3_target_y = background_y_pos - 1550
+            elif (worker_3_seed[i] >= 1):
+                woker_3_target_x = background_x_pos + 1500
+                woker_3_target_y = background_y_pos - 1560
+
+    if worker_3_x_pos < woker_3_target_x:
+        worker_3_x_pos += worker_3_speed
+    elif worker_3_x_pos > woker_3_target_x:
+        worker_3_x_pos -= worker_3_speed
+    if worker_3_y_pos < woker_3_target_y:
+        worker_3_y_pos += worker_3_speed
+    elif worker_3_y_pos > woker_3_target_y:
+        worker_3_y_pos -= worker_3_speed
+
+    worker_3_x_pos += to_x * dt
+    worker_3_y_pos += to_y * dt
+    print(woker_3_target_x, woker_3_target_y, worker_3_x_pos, worker_3_y_pos)
+        
 
     # 3. 게임 배경 위치 정의
     # 배경 X 좌표 제한
@@ -295,7 +322,7 @@ while running:
                                 inventory_text[1] = inventory_font.render(str(inventory[1]), True, (255, 255, 255))
 
     if (worker_3_jud == 1):
-        screen.blit(worker_3, (background_x_pos + 1275, background_y_pos - 1550))
+        screen.blit(worker_3, (worker_3_x_pos, worker_3_y_pos))
 
     screen.blit(character, (character_x_pos, character_y_pos)) # 캐릭터를 그리기
     pygame.draw.rect(screen, (0 ,0 ,0), (character_x_pos - (maxhp / 2.9) , character_y_pos - 30, maxhp, 15)) # hp바 배경
@@ -597,7 +624,9 @@ data = {
     "hp" : int(hp),
     "plants_time": plants_time,
     "plants_seat": plants_seat,
-    "worker_3_jud" : worker_3_jud
+    "worker_3_jud" : worker_3_jud,
+    "worker_3_seed" : worker_3_seed,
+    "worker_3_flower" : worker_3_flower
 }
 with open(save_file, "w", encoding="utf8") as f:
     json.dump(data, f, ensure_ascii=False, indent=4)
