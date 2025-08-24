@@ -74,10 +74,13 @@ store_UI = pygame.image.load(os.path.join(image_path, "store_ui.png"))
 press = pygame.image.load(os.path.join(image_path, "press.png"))
 worker_3 = pygame.image.load(os.path.join(image_path, "worker_3.png"))
 worker_2 = pygame.image.load(os.path.join(image_path, "worker_2.png"))
+worker_1 = pygame.image.load(os.path.join(image_path, "worker_1.png"))
+store_UI_unbuy = pygame.image.load(os.path.join(image_path, "store_UI_unbuy.png"))
 
 # 이미지 크기
 worker_3_UI = pygame.transform.scale(worker_3, (worker_3.get_width() * 2, worker_3.get_height() * 2))
 worker_2_UI = pygame.transform.scale(worker_2, (worker_2.get_width() * 2, worker_2.get_height() * 2))
+worker_1_UI = pygame.transform.scale(worker_1, (worker_1.get_width() * 2, worker_1.get_height() * 2))
 
 # 저장 내용 불러오기
 if os.path.exists(save_file):
@@ -102,7 +105,7 @@ worker_2_jud = data.get("worker_2_jud", 0)
 worker_2_seed = data.get("worker_2_seed", [])
 worker_2_flower = data.get("worker_2_flower", [])
 worker_1_jud = data.get("worker_1_jud", 0)
-worker_1_fish = data.get("worker_1_fish", [])
+worker_1_fish = data.get("worker_1_fish", [0])
 
 # Font 정의
 game_font = pygame.font.Font(pixel_pont_path, 100)
@@ -169,8 +172,10 @@ worker_2_prev_bucket = None
 last_time_2 = [0, 0, 0]
 worker_1_world_x = 1500
 worker_1_world_y = -1550
-worker_1_speed = 10
+worker_1_speed = 5
 worker_1_pos_jud = 0
+worker_1_prev_bucket = None
+last_time_1 = [0,0]
 
 
 # 배경음악
@@ -280,7 +285,7 @@ while running:
         # 월드 기준 목표 좌표
         target1_x, target1_y = 1265, -1550  # 상점
         target2_x, target2_y = 1500, -1560  # 밭
-        target3_x, target3_y = 1265, -900
+        target3_x, target3_y = 1265, 1600
 
         if current_bucket == 0:  # 상점으로 가기
             target_x = target1_x
@@ -347,10 +352,6 @@ while running:
     if worker_2_jud == 1:
         num = 0
 
-        # 목표 좌표(상점/밭) - 일꾼2에서도 명시해두면 안전
-        target1_x, target1_y = 1265, -1550  # 상점
-        target2_x, target2_y = 1500, -1560  # 밭
-
         # 0: seed==0 or flower>=3 → 상점, 1: 그 외 → 밭
         current_bucket_2 = 0 if (worker_2_seed[num] == 0 or worker_2_flower[num] >= 3) else 1
 
@@ -388,13 +389,11 @@ while running:
             # 상점에 도착 → 1초마다 꽃 1개 판매 (+코인)
             elif (target_x_2 == target1_x and target_y_2 == target1_y):
                 # (참고) 아래 for-루프는 프레임 내에서는 1개만 동작합니다.
-                for _ in range(5):
-                    if (coin > 0 and (now_ms - last_time_2[2] >= 1000)):
+                if (coin > 0 and (now_ms - last_time_2[2] >= 1000)):
                         coin -= 10
                         worker_2_seed[num] += 1
                         last_time_2[2] = now_ms
-                    else:
-                        break
+
                 if worker_2_flower[num] > 0 and (now_ms - last_time_2[1] >= 1000):
                     coin += 90
                     worker_2_flower[num] -= 1
@@ -413,6 +412,75 @@ while running:
 
         # 다음 프레임 대비
         worker_2_prev_bucket = current_bucket_2
+
+    # ====== 일꾼1 로직 ======
+    if worker_1_jud == 1:
+        num = 0
+        
+
+        if (worker_1_prev_bucket == 0 and worker_1_fish[num] > 0):
+            current_bucket_1 = 0
+        else:
+            current_bucket_1 = 0 if (worker_1_fish[num] >= 5) else 1
+
+        is_first_1 = (worker_1_prev_bucket is None)
+        bucket_changed_1 = is_first_1 or (current_bucket_1 != worker_1_prev_bucket)
+
+        if current_bucket_1 == 0:
+            target_x_1, target_y_1 = target1_x, target1_y
+        else:
+            target_x_1, target_y_1 = target3_x, target3_y
+
+        woker_1_target_x = target_x_1
+        woker_1_target_y = target_y_1
+
+        # 도착 판정
+        arrived_1 = (-6 < (worker_1_world_x - woker_1_target_x) < 6) and (-6 < (worker_1_world_y - woker_1_target_y) < 6)
+        cul2 = 0
+        
+
+        # 이동/정지 상태
+        if bucket_changed_1 or (not arrived_1):
+            worker_1_pos_jud = 1
+        else:
+            worker_1_pos_jud = 0
+            if (target_x_1 == target3_x and target_y_1 == target3_y):
+                screen.blit(fish_tool, ((fish_x_pos - 30, fish_y_pos - 20)))
+                if now_ms - last_time_1[0] >= 500:
+                    
+                    if random.random() < 0.5:
+                        worker_1_fish[num] += 1
+                    last_time_1[0] = now_ms
+                    if cul2 == 0: 
+                        fish_x_pos -= 10 
+                    if cul2 == 1: 
+                        fish_x_pos += 10 
+                    if cul2 == 2: 
+                        cul2 = -1
+                
+
+            elif (target_x_1 == target1_x and target_y_1 == target1_y):
+                if worker_1_fish[num] > 0 and (now_ms - last_time_1[1] >= 1000):
+                    coin += 250
+                    print(1)
+                    worker_1_fish[num] -= 1
+                    last_time_1[1] = now_ms
+            
+
+        # 이동 처리
+        if worker_1_pos_jud == 1:
+            if worker_1_world_x < woker_1_target_x:
+                worker_1_world_x += worker_1_speed
+            elif worker_1_world_x > woker_1_target_x:
+                worker_1_world_x -= worker_1_speed
+            if worker_1_world_y < woker_1_target_y:
+                worker_1_world_y += worker_1_speed
+            elif worker_1_world_y > woker_1_target_y:
+                worker_1_world_y -= worker_1_speed
+
+        # 다음 프레임 대비
+        worker_1_prev_bucket = current_bucket_1
+        cul2 = 0
 
 
     # 3. 게임 배경 위치 정의 (클램프)
@@ -492,11 +560,19 @@ while running:
         worker_2_screen_x = int(background_x_pos + worker_2_world_x)
         worker_2_screen_y = int(background_y_pos + worker_2_world_y)
         screen.blit(worker_2, (worker_2_screen_x, worker_2_screen_y))
+    
+    if (worker_1_jud == 1):
+        worker_1_screen_x = int(background_x_pos + worker_1_world_x)
+        worker_1_screen_y = int(background_y_pos + worker_1_world_y)
+        screen.blit(worker_1, (worker_1_screen_x, worker_1_screen_y))
 
     # 캐릭터
     screen.blit(character, (character_x_pos, character_y_pos))
     pygame.draw.rect(screen, (0, 0, 0), (character_x_pos - (maxhp / 2.9), character_y_pos - 30, maxhp, 15))
     pygame.draw.rect(screen, (255, 0, 0), (character_x_pos - (maxhp / 3.2), character_y_pos - 27.5, hp - 5, 10))
+
+    
+    screen.blit(fish_tool, ((background_x_pos + worker_1_world_x - 30, background_y_pos + worker_1_world_y - 20)))
 
     cul4 = 250
     if fish == 1:
@@ -693,6 +769,7 @@ while running:
         # 아이템 아이콘 표시
         screen.blit(worker_3_UI, (store_UI_x_pos - store_UI_width / 2 + 115, store_UI_y_pos - store_UI_height / 2 + 230))
         screen.blit(worker_2_UI, (store_UI_x_pos - store_UI_width / 2 + 115, store_UI_y_pos - store_UI_height / 2 + 480))
+        screen.blit(worker_1_UI, (store_UI_x_pos - store_UI_width / 2 + 115, store_UI_y_pos - store_UI_height / 2 + 730))
 
         # 가격 텍스트 생성
         worker_3_buy = inventory_font.render("1000 coin", True, (255, 255, 255))
@@ -700,12 +777,18 @@ while running:
         worker_1_buy = inventory_font.render("15000 coin", True, (255, 255, 255))
 
         # 구매 UI 그리기
-        cul = 0
-        for i in range(3):
-            screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
-            cul += 1
-        cul = 0
-        
+        if (worker_3_jud == 0):
+            screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200))
+        else:
+            screen.blit(store_UI_unbuy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200))
+        if (worker_3_jud == 0):
+            screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + 250))
+        else:
+            screen.blit(store_UI_unbuy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + 250))
+        if (worker_3_jud == 0):
+            screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + 500))
+        else:
+            screen.blit(store_UI_unbuy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + 500))
         # 가격 텍스트 표시
         screen.blit(worker_3_buy, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 180))
         screen.blit(worker_2_buy, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 200 + 230))
@@ -725,19 +808,19 @@ while running:
                 for cul in range(3):
                     if 290 < pygame.mouse.get_pos()[0] < 590:  # buy 영역
                         if cul * 250 + 200 < pygame.mouse.get_pos()[1] < cul * 250 + 350:
-                            if cul == 0: #일꾼3
+                            if cul == 0 and worker_3_jud == 0: #일꾼3
                                 if coin >= 1000:
                                     worker_3_jud = 1
                                     worker_3_seed[0] += 5
                                     coin -= 1000
-                            elif cul == 1: #일꾼2
+                            elif cul == 1 and worker_2_jud == 0: #일꾼2
                                 if coin >= 5000:
                                     worker_2_jud = 1
                                     worker_2_seed[0] += 5
                                     coin -= 5000
-                            elif cul == 2: #일꾼1
+                            elif cul == 2 and worker_1_jud == 0: #일꾼1
                                 if coin >= 15000:
-                                    inventory[2] += 1
+                                    worker_1_jud = 1
                                     coin -= 15000
 
     if -520 - field_num[0] * 100 < background_x_pos < -520 and 2150 - field_num[1] * 100 < background_y_pos < 2125:
@@ -775,7 +858,9 @@ data = {
     "worker_3_flower": worker_3_flower,
     "worker_2_jud": worker_2_jud,
     "worker_2_seed": worker_2_seed,
-    "worker_2_flower": worker_2_flower
+    "worker_2_flower": worker_2_flower,
+    "worker_1_jud": worker_1_jud,
+    "worker_1_fish": worker_1_fish,
 }
 with open(save_file, "w", encoding="utf8") as f:
     json.dump(data, f, ensure_ascii=False, indent=4)
