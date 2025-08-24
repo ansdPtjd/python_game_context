@@ -4,6 +4,7 @@ import time
 import random
 import sys
 import json
+import threading
 
 ##############################################################
 # 기본 초기화 (반드시 해야 하는 것들)
@@ -154,6 +155,8 @@ worker_3_speed = 10
 woker_3_pos_jud = 0
 WORKER_IDX = 0
 woker_3_prev_bucket = None
+last_plant_time = [0, 0]
+now = [0, 0]
 
 # 배경음악
 # 배경음악 로드 및 반복 재생
@@ -185,6 +188,9 @@ while running:
     # 인벤토리 텍스트 업데이트
     for i in range(3):
         inventory_text[i] = inventory_font.render(str(inventory[i]), True, (255, 255, 255))
+
+        now[0] = pygame.time.get_ticks()
+        now[1] = pygame.time.get_ticks()
 
     # 2. 이벤트 처리 (키보드, 마우스 등)
     cul = 0
@@ -250,6 +256,7 @@ while running:
     background_x_pos += to_x * dt # FPS가 달라짐에 따라 속도가 변하는 것을 방지
     background_y_pos += to_y * dt
     
+    #일꾼3
     i = WORKER_IDX
 
     current_bucket = 0 if (worker_3_seed[i] == 0 or worker_3_flower[i] >= 3) else 1
@@ -260,17 +267,44 @@ while running:
 
     target1_x, target1_y = 1265, -1550
     target2_x, target2_y = 1500, -1560
-    target_x, target_y = (target1_x, target1_y) if current_bucket == 0 else (target2_x, target2_y)
+    
+    if current_bucket == 0: #상점으로 가기
+        target_x = target1_x
+        target_y = target1_y
+        
+    else:                   #밭으로 가기
+        target_x = target2_x
+        target_y = target2_y
 
     woker_3_target_x = target_x
     woker_3_target_y = target_y
 
     arrived = (-10 < (worker_3_world_x - woker_3_target_x) < 10) and (-10 < (worker_3_world_y - woker_3_target_y) < 10)
+    cul = 0
 
     if bucket_changed or (not arrived):
         woker_3_pos_jud = 1
     else:
         woker_3_pos_jud = 0
+        if (target_x == target2_x and target_y == target2_y):
+            for i in range(worker_3_seed[0]):
+                if worker_3_seed[0] > 0 and now[0] - last_plant_time[0] >= 1000:
+                    for cul in range(field_num[0] * field_num[1]):
+                        if plants_seat[cul] == 0:  # 현재 좌석이 비어있다면
+                            plants_seat[cul] = 1
+                            if len(plants_time) <= cul:
+                                plants_time.append(0)
+                            plants_time[cul] = 1500  # 약 30초
+                            worker_3_seed[0] -= 1
+                            last_plant_time[0] = now[0]
+                            break
+        elif target_x == target1_x and target_y == target1_y:
+            for i in range(worker_3_flower[0]):
+                if worker_3_flower[0] > 0 and now[1] - last_plant_time[1] >= 1000:
+                    coin += 90
+                    worker_3_flower[0] -= 1
+                    last_plant_time[1] = now[1]
+
 
     if woker_3_pos_jud == 1:
         if worker_3_world_x < woker_3_target_x:
@@ -343,8 +377,14 @@ while running:
                                 plants_time[a] = 1_000_000_000  # 오류 방지
                                 inventory[1] += 1
                                 inventory_text[1] = inventory_font.render(str(inventory[1]), True, (255, 255, 255))
+                    elif woker_3_pos_jud == 0 and target_x == target2_x and target_y == target2_y:
+                        for a, plant_time in enumerate(plants_time):
+                            if plant_time == 0:
+                                plants_seat[a] = 0
+                                plants_time[a] = 1_000_000_000  # 오류 방지
+                                worker_3_flower[0] += 1
 
-    if (worker_3_jud == 1):
+    if (worker_3_jud == 1): #일꾼3
         screen.blit(worker_3, (worker_3_screen_x, worker_3_screen_y))
 
     screen.blit(character, (character_x_pos, character_y_pos)) # 캐릭터를 그리기
@@ -372,7 +412,6 @@ while running:
                 UI_text = UI_font.render(str("Press {0} button".format(str(press_button))), True, (0, 0, 0))
                 screen.blit(UI_text, (character_x_pos + 50, character_y_pos))
 
-            print(cul)
             screen.blit(background_reset, (0,0))
             screen.blit(background, (background_x_pos, background_y_pos))
             screen.blit(background, (background_x_pos, background_y_pos - background_height))
@@ -551,27 +590,20 @@ while running:
 
         # 가격 텍스트 생성
         worker_3_buy = inventory_font.render("1000 coin", True, (255, 255, 255))
-        worker_3_sell = inventory_font.render("100 coin", True, (255, 255, 255))
         # seed_buy_text = inventory_font.render("10 coin", True, (255, 255, 255))
-        # seed_sell_text = inventory_font.render("5 coin", True, (255, 255, 255))
         # fish_buy_text = inventory_font.render("300 coin", True, (255, 255, 255))
-        # fish_sell_text = inventory_font.render("250 coin", True, (255, 255, 255))
 
 
         # 구매 및 판매 UI 그리기
         for i in range(1):
             screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
-            screen.blit(store_UI_sell, (store_UI_x_pos - store_UI_width / 2 + 500, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
             cul += 1
         cul = 0
 
         # 가격 텍스트 표시
         screen.blit(worker_3_buy, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 180))
-        screen.blit(worker_3_sell, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 180))
         # screen.blit(seed_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 200 + 230))
-        # screen.blit(seed_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 200 + 230))
         # screen.blit(fish_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 200 + 480))
-        # screen.blit(fish_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 200 + 480))
         # screen.blit(field_buy_text, (store_UI_x_pos - store_UI_width / 2 + 1210, store_UI_y_pos - store_UI_height / 2 + 180))
 
         # UI 위치 초기화
@@ -592,6 +624,7 @@ while running:
                             if cul == 0: 
                                 if coin >= 1000:
                                     worker_3_jud = 1
+                                    worker_3_seed[worker_3_jud - 1] = 5
                                     coin -= 1000
                             # elif cul == 1:  # 씨앗
                             #     if coin >= 10:
@@ -601,21 +634,6 @@ while running:
                             #     if coin >= 300:
                             #         inventory[2] += 1
                             #         coin -= 300
-
-                    elif 600 < pygame.mouse.get_pos()[0] < 900:  # sell 영역
-                        if cul * 250 + 200 < pygame.mouse.get_pos()[1] < cul * 250 + 350:
-                            if cul == 0:
-                                if worker_3_jud == 1:
-                                    worker_3_jud = 0
-                                    coin += 100
-                            # elif cul == 1:  # 씨앗
-                            #     if inventory[0] >= 1:
-                            #         inventory[0] -= 1
-                            #         coin += 5
-                            # elif cul == 2:  # 물고기
-                            #     if inventory[2] >= 1:
-                            #         inventory[2] -= 1
-                            #         coin += 250
 
     if -520 - field_num[0] * 100 < background_x_pos < -520 and 2150 - field_num[1] * 100 < background_y_pos < 2125:
         press_button = 1
