@@ -73,9 +73,11 @@ store_UI_sell = pygame.image.load(os.path.join(image_path, "store_UI_sell.png"))
 store_UI = pygame.image.load(os.path.join(image_path, "store_ui.png"))
 press = pygame.image.load(os.path.join(image_path, "press.png"))
 worker_3 = pygame.image.load(os.path.join(image_path, "worker_3.png"))
+worker_2 = pygame.image.load(os.path.join(image_path, "worker_2.png"))
 
 # 이미지 크기
-worker_UI = pygame.transform.scale(worker_3, (worker_3.get_width() * 2, worker_3.get_height() * 2))
+worker_3_UI = pygame.transform.scale(worker_3, (worker_3.get_width() * 2, worker_3.get_height() * 2))
+worker_2_UI = pygame.transform.scale(worker_2, (worker_2.get_width() * 2, worker_2.get_height() * 2))
 
 # 저장 내용 불러오기
 if os.path.exists(save_file):
@@ -96,12 +98,11 @@ plants_seat = data.get("plants_seat", [])
 worker_3_jud = data.get("worker_3_jud", 0)
 worker_3_seed = data.get("worker_3_seed", [])
 worker_3_flower = data.get("worker_3_flower", [])
-
-# 리스트 길이 보장 (빈 저장 방지)
-if not worker_3_seed:
-    worker_3_seed = [0]
-if not worker_3_flower:
-    worker_3_flower = [0]
+worker_2_jud = data.get("worker_2_jud", 0)
+worker_2_seed = data.get("worker_2_seed", [])
+worker_2_flower = data.get("worker_2_flower", [])
+worker_1_jud = data.get("worker_1_jud", 0)
+worker_1_fish = data.get("worker_1_fish", [])
 
 # Font 정의
 game_font = pygame.font.Font(pixel_pont_path, 100)
@@ -158,11 +159,19 @@ worker_3_world_x = 1500
 worker_3_world_y = -1550
 worker_3_speed = 1
 woker_3_pos_jud = 0
-WORKER_IDX = 0
 woker_3_prev_bucket = None
-
-# 1초 간격 타이머 (씨앗 심기 / 꽃 판매) - [밭, 상점]
 last_time = [0, 0, 0]
+worker_2_world_x = 1500
+worker_2_world_y = -1550
+worker_2_speed = 5
+worker_2_pos_jud = 0
+worker_2_prev_bucket = None
+last_time_2 = [0, 0, 0]
+worker_1_world_x = 1500
+worker_1_world_y = -1550
+worker_1_speed = 10
+worker_1_pos_jud = 0
+
 
 # 배경음악
 # background_sound = pygame.mixer.Sound(os.path.join(music_path, "background.mp3"))
@@ -260,77 +269,151 @@ while running:
     background_y_pos += to_y * dt
 
     # ====== 일꾼3 로직 ======
-    i = WORKER_IDX
-    # 0: seed==0 or flower>=3 → 상점(target1), 1: 그 외 → 밭(target2)
-    current_bucket = 0 if (worker_3_seed[i] == 0 or worker_3_flower[i] >= 3) else 1
+    if worker_3_jud == 1:    
+        num = 0
+        # 0: seed==0 or flower>=3 → 상점(target1), 1: 그 외 → 밭(target2)
+        current_bucket = 0 if (worker_3_seed[num] == 0 or worker_3_flower[num] >= 3) else 1
 
-    is_first = (woker_3_prev_bucket is None)
-    bucket_changed = is_first or (current_bucket != woker_3_prev_bucket)
+        is_first = (woker_3_prev_bucket is None)
+        bucket_changed = is_first or (current_bucket != woker_3_prev_bucket)
 
-    # 월드 기준 목표 좌표
-    target1_x, target1_y = 1265, -1550  # 상점
-    target2_x, target2_y = 1500, -1560  # 밭
+        # 월드 기준 목표 좌표
+        target1_x, target1_y = 1265, -1550  # 상점
+        target2_x, target2_y = 1500, -1560  # 밭
+        target3_x, target3_y = 1265, -900
 
-    if current_bucket == 0:  # 상점으로 가기
-        target_x = target1_x
-        target_y = target1_y
-    else:                    # 밭으로 가기
-        target_x = target2_x
-        target_y = target2_y
+        if current_bucket == 0:  # 상점으로 가기
+            target_x = target1_x
+            target_y = target1_y
+        else:                    # 밭으로 가기
+            target_x = target2_x
+            target_y = target2_y
 
-    # 목표 월드 좌표 동기화
-    woker_3_target_x = target_x
-    woker_3_target_y = target_y
+        # 목표 월드 좌표 동기화
+        woker_3_target_x = target_x
+        woker_3_target_y = target_y
 
-    # 도착 판정(월드 좌표)
-    arrived = (-2 < (worker_3_world_x - woker_3_target_x) < 2) and (-2 < (worker_3_world_y - woker_3_target_y) < 2)
+        # 도착 판정(월드 좌표)
+        arrived = (-2 < (worker_3_world_x - woker_3_target_x) < 2) and (-2 < (worker_3_world_y - woker_3_target_y) < 2)
 
-    # 이동 상태 결정: 목표 바뀌었거나 도착 전이면 이동(1), 그 외 0
-    if bucket_changed or (not arrived):
-        woker_3_pos_jud = 1
-    else:
-        woker_3_pos_jud = 0
-        # ✅ 도착했고 목표가 밭이면: 1초마다 1개 심기
-        if (target_x == target2_x and target_y == target2_y):
-            if worker_3_seed[0] > 0 and (now_ms - last_time[0] >= 1000):
-                for cul in range(field_num[0] * field_num[1]):
-                    if plants_seat[cul] == 0:  # 빈 자리
-                        plants_seat[cul] = 1
-                        if len(plants_time) <= cul:
-                            plants_time.append(0)
-                        plants_time[cul] = 1500
-                        worker_3_seed[0] -= 1
-                        last_time[0] = now_ms
+        # 이동 상태 결정: 목표 바뀌었거나 도착 전이면 이동(1), 그 외 0
+        if bucket_changed or (not arrived):
+            woker_3_pos_jud = 1
+        else:
+            woker_3_pos_jud = 0
+            # ✅ 도착했고 목표가 밭이면: 1초마다 1개 심기
+            if (target_x == target2_x and target_y == target2_y):
+                if worker_3_seed[num] > 0 and (now_ms - last_time[0] >= 1000):
+                    for cul in range(field_num[0] * field_num[1]):
+                        if plants_seat[cul] == 0:  # 빈 자리
+                            plants_seat[cul] = 1
+                            if len(plants_time) <= cul:
+                                plants_time.append(0)
+                            plants_time[cul] = 1500
+                            worker_3_seed[num] -= 1
+                            last_time[0] = now_ms
+                            break
+            # ✅ 도착했고 목표가 상점이면: 1초마다 1개 판매(코인+)
+            elif (target_x == target1_x and target_y == target1_y):
+                for i in range(5):
+                    if (coin > 0 and (now_ms - last_time[2] >= 1000)):
+                        coin -= 10
+                        worker_3_seed[num] += 1
+                        last_time[2] = now_ms
+                    else:
                         break
-        # ✅ 도착했고 목표가 상점이면: 1초마다 1개 판매(코인+)
-        elif (target_x == target1_x and target_y == target1_y):
-            for i in range(5):
-                if (coin > 0 and (now_ms - last_time[2] >= 1000)):
-                    coin -= 10
-                    worker_3_seed[0] += 1
-                    last_time[2] = now_ms
-                else:
-                    break
-            if worker_3_flower[0] > 0 and (now_ms - last_time[1] >= 1000):
-                coin += 90
-                worker_3_flower[0] -= 1
-                last_time[1] = now_ms
-    # ========================
+                if worker_3_flower[num] > 0 and (now_ms - last_time[1] >= 1000):
+                    coin += 90
+                    worker_3_flower[num] -= 1
+                    last_time[1] = now_ms
+        # ========================
 
-    # 이동(월드 좌표)
-    if woker_3_pos_jud == 1:
-        if worker_3_world_x < woker_3_target_x:
-            worker_3_world_x += worker_3_speed
-        elif worker_3_world_x > woker_3_target_x:
-            worker_3_world_x -= worker_3_speed
+        # 이동(월드 좌표)
+        if woker_3_pos_jud == 1:
+            if worker_3_world_x < woker_3_target_x:
+                worker_3_world_x += worker_3_speed
+            elif worker_3_world_x > woker_3_target_x:
+                worker_3_world_x -= worker_3_speed
 
-        if worker_3_world_y < woker_3_target_y:
-            worker_3_world_y += worker_3_speed
-        elif worker_3_world_y > woker_3_target_y:
-            worker_3_world_y -= worker_3_speed
+            if worker_3_world_y < woker_3_target_y:
+                worker_3_world_y += worker_3_speed
+            elif worker_3_world_y > woker_3_target_y:
+                worker_3_world_y -= worker_3_speed
 
-    # 다음 프레임 비교용
-    woker_3_prev_bucket = current_bucket
+        # 다음 프레임 비교용
+        woker_3_prev_bucket = current_bucket
+
+    # ====== 일꾼2 로직 ======
+    if worker_2_jud == 1:
+        num = 0
+
+        # 목표 좌표(상점/밭) - 일꾼2에서도 명시해두면 안전
+        target1_x, target1_y = 1265, -1550  # 상점
+        target2_x, target2_y = 1500, -1560  # 밭
+
+        # 0: seed==0 or flower>=3 → 상점, 1: 그 외 → 밭
+        current_bucket_2 = 0 if (worker_2_seed[num] == 0 or worker_2_flower[num] >= 3) else 1
+
+        is_first_2 = (worker_2_prev_bucket is None)
+        bucket_changed_2 = is_first_2 or (current_bucket_2 != worker_2_prev_bucket)
+
+        if current_bucket_2 == 0:
+            target_x_2, target_y_2 = target1_x, target1_y
+        else:
+            target_x_2, target_y_2 = target2_x, target2_y
+
+        woker_2_target_x = target_x_2
+        woker_2_target_y = target_y_2
+
+        # 도착 판정
+        arrived_2 = (-6 < (worker_2_world_x - woker_2_target_x) < 6) and (-6 < (worker_2_world_y - woker_2_target_y) < 6)
+
+        # 이동/정지 상태
+        if bucket_changed_2 or (not arrived_2):
+            worker_2_pos_jud = 1
+        else:
+            worker_2_pos_jud = 0
+            # 밭에 도착 → 1초마다 씨앗 1개 심기
+            if (target_x_2 == target2_x and target_y_2 == target2_y):
+                if worker_2_seed[num] > 0 and (now_ms - last_time_2[0] >= 1000):
+                    for cul in range(field_num[0] * field_num[1]):
+                        if plants_seat[cul] == 0:
+                            plants_seat[cul] = 1
+                            if len(plants_time) <= cul:
+                                plants_time.append(0)
+                            plants_time[cul] = 1500
+                            worker_2_seed[num] -= 1
+                            last_time_2[0] = now_ms
+                            break
+            # 상점에 도착 → 1초마다 꽃 1개 판매 (+코인)
+            elif (target_x_2 == target1_x and target_y_2 == target1_y):
+                # (참고) 아래 for-루프는 프레임 내에서는 1개만 동작합니다.
+                for _ in range(5):
+                    if (coin > 0 and (now_ms - last_time_2[2] >= 1000)):
+                        coin -= 10
+                        worker_2_seed[num] += 1
+                        last_time_2[2] = now_ms
+                    else:
+                        break
+                if worker_2_flower[num] > 0 and (now_ms - last_time_2[1] >= 1000):
+                    coin += 90
+                    worker_2_flower[num] -= 1
+                    last_time_2[1] = now_ms
+
+        # 이동 처리
+        if worker_2_pos_jud == 1:
+            if worker_2_world_x < woker_2_target_x:
+                worker_2_world_x += worker_2_speed
+            elif worker_2_world_x > woker_2_target_x:
+                worker_2_world_x -= worker_2_speed
+            if worker_2_world_y < woker_2_target_y:
+                worker_2_world_y += worker_2_speed
+            elif worker_2_world_y > woker_2_target_y:
+                worker_2_world_y -= worker_2_speed
+
+        # 다음 프레임 대비
+        worker_2_prev_bucket = current_bucket_2
+
 
     # 3. 게임 배경 위치 정의 (클램프)
     background_x_pos = max(-5840, min(background_x_pos, 0))
@@ -392,11 +475,23 @@ while running:
                                 plants_time[a] = 1_000_000_000  # 오류 방지
                                 worker_3_flower[0] += 1
 
+                    elif worker_2_pos_jud == 0 and target_x_2 == target2_x and target_y_2 == target2_y:
+                        for a, plant_time in enumerate(plants_time):
+                            if plant_time == 0:
+                                plants_seat[a] = 0
+                                plants_time[a] = 1_000_000_000  # 오류 방지
+                                worker_2_flower[0] += 1
+
     # 일꾼 3 그리기 (월드→스크린 변환 + 정수화)
     if (worker_3_jud == 1):
         worker_3_screen_x = int(background_x_pos + worker_3_world_x)
         worker_3_screen_y = int(background_y_pos + worker_3_world_y)
         screen.blit(worker_3, (worker_3_screen_x, worker_3_screen_y))
+
+    if (worker_2_jud == 1):
+        worker_2_screen_x = int(background_x_pos + worker_2_world_x)
+        worker_2_screen_y = int(background_y_pos + worker_2_world_y)
+        screen.blit(worker_2, (worker_2_screen_x, worker_2_screen_y))
 
     # 캐릭터
     screen.blit(character, (character_x_pos, character_y_pos))
@@ -596,16 +691,25 @@ while running:
         store_UI_y_pos -= 50
 
         # 아이템 아이콘 표시
-        screen.blit(worker_UI, (store_UI_x_pos - store_UI_width / 2 + 115, store_UI_y_pos - store_UI_height / 2 + 230))
+        screen.blit(worker_3_UI, (store_UI_x_pos - store_UI_width / 2 + 115, store_UI_y_pos - store_UI_height / 2 + 230))
+        screen.blit(worker_2_UI, (store_UI_x_pos - store_UI_width / 2 + 115, store_UI_y_pos - store_UI_height / 2 + 480))
 
         # 가격 텍스트 생성
         worker_3_buy = inventory_font.render("1000 coin", True, (255, 255, 255))
+        worker_2_buy = inventory_font.render("5000 coin", True, (255, 255, 255))
+        worker_1_buy = inventory_font.render("15000 coin", True, (255, 255, 255))
 
         # 구매 UI 그리기
-        screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200))
-
+        cul = 0
+        for i in range(3):
+            screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
+            cul += 1
+        cul = 0
+        
         # 가격 텍스트 표시
         screen.blit(worker_3_buy, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 180))
+        screen.blit(worker_2_buy, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 200 + 230))
+        screen.blit(worker_1_buy, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 200 + 480))
 
         # UI 위치 초기화
         store_UI_x_pos = 975
@@ -618,14 +722,23 @@ while running:
                     if store_UI_y_pos - store_UI_height / 2 - 100 < pygame.mouse.get_pos()[1] < store_UI_y_pos - store_UI_height / 2:
                         work_jud = 0
 
-                # 워커 구매 처리 (안전 인덱싱)
-                if 290 < pygame.mouse.get_pos()[0] < 590 and 200 < pygame.mouse.get_pos()[1] < 350:
-                    if coin >= 1000:
-                        worker_3_jud = 1
-                        if not worker_3_seed:
-                            worker_3_seed = [0]
-                        worker_3_seed[0] = 5
-                        coin -= 1000
+                for cul in range(3):
+                    if 290 < pygame.mouse.get_pos()[0] < 590:  # buy 영역
+                        if cul * 250 + 200 < pygame.mouse.get_pos()[1] < cul * 250 + 350:
+                            if cul == 0: #일꾼3
+                                if coin >= 1000:
+                                    worker_3_jud = 1
+                                    worker_3_seed[0] += 5
+                                    coin -= 1000
+                            elif cul == 1: #일꾼2
+                                if coin >= 5000:
+                                    worker_2_jud = 1
+                                    worker_2_seed[0] += 5
+                                    coin -= 5000
+                            elif cul == 2: #일꾼1
+                                if coin >= 15000:
+                                    inventory[2] += 1
+                                    coin -= 15000
 
     if -520 - field_num[0] * 100 < background_x_pos < -520 and 2150 - field_num[1] * 100 < background_y_pos < 2125:
         press_button = 1
@@ -659,7 +772,10 @@ data = {
     "plants_seat": plants_seat,
     "worker_3_jud": worker_3_jud,
     "worker_3_seed": worker_3_seed,
-    "worker_3_flower": worker_3_flower
+    "worker_3_flower": worker_3_flower,
+    "worker_2_jud": worker_2_jud,
+    "worker_2_seed": worker_2_seed,
+    "worker_2_flower": worker_2_flower
 }
 with open(save_file, "w", encoding="utf8") as f:
     json.dump(data, f, ensure_ascii=False, indent=4)
