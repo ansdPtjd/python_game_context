@@ -5,6 +5,7 @@ import random
 import sys
 import json
 
+# 45
 ##############################################################
 # 기본 초기화 (반드시 해야 하는 것들)
 
@@ -20,7 +21,7 @@ def resource_path(relative_path):
 pygame.init()
 
 # 화면 크기 설정
-screen_width = 1980
+screen_width = 1920
 screen_height = 1080
 screen = pygame.display.set_mode((screen_width, screen_height))
 
@@ -71,16 +72,25 @@ store_ESC = pygame.image.load(os.path.join(image_path, "ESC.png"))
 store_UI_buy = pygame.image.load(os.path.join(image_path, "store_UI_buy.png"))
 store_UI_sell = pygame.image.load(os.path.join(image_path, "store_UI_sell.png"))
 store_UI = pygame.image.load(os.path.join(image_path, "store_ui.png"))
-press = pygame.image.load(os.path.join(image_path, "press.png"))
 worker_3 = pygame.image.load(os.path.join(image_path, "worker_3.png"))
 worker_2 = pygame.image.load(os.path.join(image_path, "worker_2.png"))
 worker_1 = pygame.image.load(os.path.join(image_path, "worker_1.png"))
 store_UI_unbuy = pygame.image.load(os.path.join(image_path, "store_UI_unbuy.png"))
+Button_1 = pygame.image.load(os.path.join(image_path, "1.png"))
+Button_2 = pygame.image.load(os.path.join(image_path, "2.png"))
+Button_3 = pygame.image.load(os.path.join(image_path, "3.png"))
+Button_f = pygame.image.load(os.path.join(image_path, "F.png"))
+Button_space = pygame.image.load(os.path.join(image_path, "SPACEALTERNATIVE.png"))
 
 # 이미지 크기
 worker_3_UI = pygame.transform.scale(worker_3, (worker_3.get_width() * 2, worker_3.get_height() * 2))
 worker_2_UI = pygame.transform.scale(worker_2, (worker_2.get_width() * 2, worker_2.get_height() * 2))
 worker_1_UI = pygame.transform.scale(worker_1, (worker_1.get_width() * 2, worker_1.get_height() * 2))
+Button_1_UI = pygame.transform.scale(Button_1, (Button_1.get_width() * 2, Button_1.get_height() * 2))
+Button_2_UI = pygame.transform.scale(Button_2, (Button_2.get_width() * 2, Button_2.get_height() * 2))
+Button_3_UI = pygame.transform.scale(Button_3, (Button_3.get_width() * 2, Button_3.get_height() * 2))
+Button_f_UI = pygame.transform.scale(Button_f, (Button_f.get_width() * 2, Button_f.get_height() * 2))
+Button_space_UI = pygame.transform.scale(Button_space, (Button_space.get_width() * 2, Button_space.get_height() * 2))
 
 # 저장 내용 불러오기
 if os.path.exists(save_file):
@@ -112,9 +122,8 @@ game_font = pygame.font.Font(pixel_pont_path, 100)
 gameover_font = pygame.font.Font(pixel_pont_path, 100)
 inventory_font = pygame.font.Font(pixel_pont_path, 25)
 UI_font = pygame.font.Font(pixel_pont_path, 50)
-press_button = 0
-UI_text = gameover_font.render(str("Press {0}".format(str(press_button))), True, (0, 0, 0))
 gameover_text = gameover_font.render(str("[피로도에 의해 캐릭터가 기절했습니다.]"), True, (255, 0, 0))
+UI_key_pont = pygame.font.Font(pixel_pont_path, 25)
 
 # 리스트
 field_num = [field_x, field_y]
@@ -250,7 +259,7 @@ while running:
                     fish = 1
                 elif -365 < background_x_pos < -225 and background_y_pos > 2150:
                     store_jud = 1
-                elif -665 < background_x_pos < 525 and background_y_pos > 2150:
+                elif -665 < background_x_pos < -525 and background_y_pos > 2150:
                     work_jud = 1
 
             # 체력 회복
@@ -588,17 +597,19 @@ while running:
         fish_point = 0
         cul4 = 250
         while cul > 0:
-            if -520 - field_num[0] * 100 < background_x_pos < -520 and 2150 - field_num[1] * 100 < background_y_pos < 2125:
-                press_button = 'space bar'
-                UI_text = UI_font.render(str("Press {0} button".format(str(press_button))), True, (0, 0, 0))
-                screen.blit(UI_text, (character_x_pos + 50, character_y_pos))
-
             screen.blit(background_reset, (0, 0))
             screen.blit(background, (int(background_x_pos), int(background_y_pos)))
             screen.blit(background, (int(background_x_pos), int(background_y_pos - background_height)))
             screen.blit(background, (int(background_x_pos + background_width), int(background_y_pos)))
             screen.blit(background, (int(background_x_pos + background_width), int(background_y_pos - background_height)))
             screen.blit(fishing1, (int(background_x_pos), int(background_y_pos + 1680)))
+            K_1_text = UI_key_pont.render(str(": 낚기"), True, (0, 0, 0))
+            screen.blit(K_1_text, (1700, 800))
+            screen.blit(Button_space_UI, (1550, 797.5))
+            if (worker_1_jud == 1):
+                worker_1_screen_x = int(background_x_pos + worker_1_world_x)
+                worker_1_screen_y = int(background_y_pos + worker_1_world_y)
+                screen.blit(worker_1, (worker_1_screen_x, worker_1_screen_y))
             screen.blit(character, (character_x_pos, character_y_pos))
             if cul2 == 0:
                 fish_x_pos -= 10
@@ -659,6 +670,36 @@ while running:
         x_pos = (screen_width / 2) - (character_width / 2) - 535 + cul * 125
         screen.blit(inventory_text[i], (x_pos, screen_height - 120))
         cul += 1
+
+    if (-815 - (field_num[0] - 3) * 110 < background_x_pos < -520 and 1855 < background_y_pos < 2125 and inventory[0] > 0):
+        K_1_text = UI_key_pont.render(str(": 해바라기 심기"), True, (0, 0, 0))
+        screen.blit(K_1_text, (1700, 900))
+        screen.blit(Button_1_UI, (1650, 897.5))
+
+    if (background_y_pos < -900):
+        K_1_text = UI_key_pont.render(str(": 낚시하기"), True, (0, 0, 0))
+        screen.blit(K_1_text, (1700, 850))
+        screen.blit(Button_f_UI, (1650, 847.5))
+    
+    if (-365 < background_x_pos < -225 and background_y_pos > 2150):
+        K_1_text = UI_key_pont.render(str(": 상점"), True, (0, 0, 0))
+        screen.blit(K_1_text, (1700, 850))
+        screen.blit(Button_f_UI, (1650, 847.5))
+
+    if (-665 < background_x_pos < -525 and background_y_pos > 2150):    
+        K_1_text = UI_key_pont.render(str(": 노동자 고용소"), True, (0, 0, 0))
+        screen.blit(K_1_text, (1700, 850))
+        screen.blit(Button_f_UI, (1650, 847.5))
+
+    if (inventory[1] > 0):
+        K_1_text = UI_key_pont.render(str(": 해바라기 먹기"), True, (0, 0, 0))
+        screen.blit(K_1_text, (1700, 750))
+        screen.blit(Button_2_UI, (1650, 747.5))
+
+    if (inventory[2] > 0):
+        K_1_text = UI_key_pont.render(str(": 물고기 먹기"), True, (0, 0, 0))
+        screen.blit(K_1_text, (1700, 700))
+        screen.blit(Button_3_UI, (1650, 697.5))
 
     cul = 0
     if store_jud == 1:
@@ -822,11 +863,6 @@ while running:
                                 if coin >= 15000:
                                     worker_1_jud = 1
                                     coin -= 15000
-
-    if -520 - field_num[0] * 100 < background_x_pos < -520 and 2150 - field_num[1] * 100 < background_y_pos < 2125:
-        press_button = 1
-        UI_text = UI_font.render(str("Press {0} button".format(str(press_button))), True, (0, 0, 0))
-        screen.blit(UI_text, (character_x_pos + 50, character_y_pos))
 
     screen.blit(coin_png, (1550, 10))  # 코인 그리기
     screen.blit(coin_text, (1650, 20))  # 코인 갯수 표시
