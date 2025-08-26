@@ -4,6 +4,7 @@ import time
 import random
 import sys
 import json
+import subprocess
 
 # 45
 ##############################################################
@@ -169,6 +170,7 @@ maxhp = 100
 to_x = 0
 to_y = 0
 background_speed = 1
+mini_game_1 = 0 #위에서 아이템과 장애물이 떨어지는 게임
 
 # NPC 월드 좌표 (카메라와 분리)
 worker_3_world_x = 1500
@@ -210,6 +212,9 @@ while running:
     now_ms = pygame.time.get_ticks()  # ✅ 프레임당 1회만 시간 읽기
 
     coin_text = game_font.render(str(coin), True, (255, 255, 255))
+
+    if (mini_game_1 == 1):
+        subprocess.Popen([sys.executable, "mini_game_1.py"])
 
     # 식물 성장 시간 업데이트
     for i in range(len(plants_time)):
@@ -382,18 +387,15 @@ while running:
         num = 0
 
         if worker_2_prev_bucket == 1:
-            # 밭에 있었으면 씨앗이 남아있는 동안은 계속 밭 유지
             if worker_2_seed[num] > 0:
-                current_bucket_2 = 1   # 밭
+                current_bucket_2 = 1
             else:
-                current_bucket_2 = 0   # 씨앗 0 → 상점
+                current_bucket_2 = 0
         else:
-            # 상점(또는 초기): 씨앗 목표치 못 채웠거나/꽃이 남아있으면 계속 상점
             if (worker_2_seed[num] < SEED_STOCK) or (worker_2_flower[num] > 0):
                 current_bucket_2 = 0   # 상점
             else:
-                current_bucket_2 = 1   # 밭
-
+                current_bucket_2 = 1
         is_first_2 = (worker_2_prev_bucket is None)
         bucket_changed_2 = is_first_2 or (current_bucket_2 != worker_2_prev_bucket)
 
