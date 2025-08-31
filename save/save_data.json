@@ -1,63 +1,39 @@
 {
-    "coin": 84110,
-    "seed": 3,
-    "flower": 24,
-    "fish": 3,
-    "field_x": 4,
-    "field_y": 4,
-    "hp": 73,
+    "coin": 120,
+    "seed": 1,
+    "flower": 0,
+    "fish": 0,
+    "field_x": 3,
+    "field_y": 3,
+    "hp": 90,
     "plants_time": [
-        132,
-        252,
-        368,
-        484,
-        536,
-        656,
-        776,
-        896,
-        1012,
-        999999048,
-        999999168,
-        16,
-        999994824,
-        999994836,
-        999994864,
-        999995868
+        999944652,
+        999944652
     ],
     "plants_seat": [
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
         0,
         0,
-        1,
+        0,
+        0,
+        0,
         0,
         0,
         0,
         0
     ],
-    "worker_3_jud": 1,
-    "worker_3_seed": [
-        0
-    ],
-    "worker_3_flower": [
-        2
-    ],
-    "worker_2_jud": 1,
-    "worker_2_seed": [
-        5
-    ],
-    "worker_2_flower": [
-        4
-    ],
-    "worker_1_jud": 1,
-    "worker_1_fish": [
-        4
-    ]
+    "worker_3_jud": 0,
+    "worker_3_seed": 0,
+    "worker_3_flower": 0,
+    "worker_2_jud": 0,
+    "worker_2_seed": 0,
+    "worker_2_flower": 0,
+    "worker_1_jud": 0,
+    "worker_1_fish": 0,
+    "ticket": 0,
+    "tomato": 0,
+    "tomato_seed": 0,
+    "pumpkin": 0,
+    "pumpkin_seed": 0,
+    "wheat": 0,
+    "wheat_seed": 0
 }
