@@ -124,6 +124,29 @@ Button_space_UI = pygame.transform.scale(Button_space, (Button_space.get_width()
 fish_UI = pygame.transform.scale(fish_png, (fish_png.get_width() //2 , fish_png.get_height() // 2))
 seed_UI = pygame.transform.scale(seed_png, (seed_png.get_width() //2 , seed_png.get_height() // 2))
 
+# 작물 타입 정의
+PLANT_NONE = 0
+PLANT_POTATO = 1
+PLANT_TOMATO = 2
+PLANT_PUMPKIN = 3
+PLANT_WHEAT = 4
+
+PLANT_IMAGES = {
+    PLANT_POTATO: [flower_dic, flower_dic2, flower_dic3, flower_dic4],
+    PLANT_TOMATO: [tomato_1, tomato_2, tomato_3, tomato_4],
+    PLANT_PUMPKIN: [pumpkin_1, pumpkin_2, pumpkin_3, pumpkin_4],
+    PLANT_WHEAT: [wheat_1, wheat_2, wheat_3, wheat_4],
+}
+
+HARVEST_INDEX = {
+    PLANT_POTATO: 1,
+    PLANT_TOMATO: 5,
+    PLANT_PUMPKIN: 7,
+    PLANT_WHEAT: 9,
+}
+
+WORKER_SELL_PRICE = [30, 90, 200, 100]
+
 # 저장 내용 불러오기
 if os.path.exists(save_file):
     with open(save_file, "r", encoding="utf8") as f:
@@ -142,10 +165,26 @@ plants_time = data.get("plants_time", [])
 plants_seat = data.get("plants_seat", [])
 worker_3_jud = data.get("worker_3_jud", 0)
 worker_3_seed = data.get("worker_3_seed", [])
+if not isinstance(worker_3_seed, list):
+    worker_3_seed = [worker_3_seed]
+while len(worker_3_seed) < 4:
+    worker_3_seed.append(0)
 worker_3_flower = data.get("worker_3_flower", [])
+if not isinstance(worker_3_flower, list):
+    worker_3_flower = [worker_3_flower]
+while len(worker_3_flower) < 4:
+    worker_3_flower.append(0)
 worker_2_jud = data.get("worker_2_jud", 0)
 worker_2_seed = data.get("worker_2_seed", [])
+if not isinstance(worker_2_seed, list):
+    worker_2_seed = [worker_2_seed]
+while len(worker_2_seed) < 4:
+    worker_2_seed.append(0)
 worker_2_flower = data.get("worker_2_flower", [])
+if not isinstance(worker_2_flower, list):
+    worker_2_flower = [worker_2_flower]
+while len(worker_2_flower) < 4:
+    worker_2_flower.append(0)
 worker_1_jud = data.get("worker_1_jud", 0)
 worker_1_fish = data.get("worker_1_fish", [0])
 ticket = data.get("ticket", 0)
@@ -320,19 +359,26 @@ while running:
             elif event.key == pygame.K_s:
                 to_y -= background_speed
 
-            # 꽃 심기 (플레이어 수동)
-            if event.key == pygame.K_1:
+            # 작물 심기 (플레이어 수동)
+            if event.key in [pygame.K_1, pygame.K_5, pygame.K_7, pygame.K_9]:
+                key_map = {
+                    pygame.K_1: (0, PLANT_POTATO),
+                    pygame.K_5: (4, PLANT_TOMATO),
+                    pygame.K_7: (6, PLANT_PUMPKIN),
+                    pygame.K_9: (8, PLANT_WHEAT),
+                }
+                seed_idx, plant_type = key_map[event.key]
                 if -520 - field_num[0] * 100 < background_x_pos < -520 and 1855 - field_num[1] * 100 < background_y_pos < 2125:
-                    if inventory[0] > 0:
+                    if inventory[seed_idx] > 0:
                         for cul in range(field_num[0] * field_num[1]):
-                            if plants_seat[cul] == 0:
-                                plants_seat[cul] = 1
+                            if plants_seat[cul] == PLANT_NONE:
+                                plants_seat[cul] = plant_type
                                 if len(plants_time) <= cul:
                                     plants_time.append(0)
                                 plants_time[cul] = 1500  # 약 30초
                                 hp -= 0.5
-                                inventory[0] -= 1
-                                inventory_text[0] = inventory_font.render(str(inventory[0]), True, (255, 255, 255))
+                                inventory[seed_idx] -= 1
+                                inventory_text[seed_idx] = inventory_font.render(str(inventory[seed_idx]), True, (255, 255, 255))
                                 break
 
             # 낚시 / 상점 / 일 시작
@@ -378,7 +424,7 @@ while running:
                 current_bucket = 0   # 씨앗 0 → 상점
         else:
             # 상점(또는 초기): 씨앗 목표치 못 채웠거나/꽃이 남아있으면 계속 상점
-            if (worker_3_seed[num] < SEED_STOCK) or (worker_3_flower[num] > 0):
+            if (worker_3_seed[num] < SEED_STOCK) or any(f > 0 for f in worker_3_flower):
                 current_bucket = 0   # 상점
             else:
                 current_bucket = 1   # 밭
@@ -412,8 +458,8 @@ while running:
                         if (worker_3_seed[num] <= 0):
                             last_time[0] = now_ms
                             break
-                        if plants_seat[cul] == 0 and (now_ms - last_time[0] >= 1000):  # 빈 자리
-                            plants_seat[cul] = 1
+                        if plants_seat[cul] == PLANT_NONE and (now_ms - last_time[0] >= 1000):  # 빈 자리
+                            plants_seat[cul] = PLANT_POTATO
                             if len(plants_time) <= cul:
                                 plants_time.append(0)
                             plants_time[cul] = 1500
@@ -426,12 +472,14 @@ while running:
                     coin -= 10
                     worker_3_seed[num] += 1
                     last_time[1] = now_ms
-                    
-                    
-                if worker_3_flower[num] > 0 and (now_ms - last_time[2] >= 1000):
-                    coin += 30
-                    worker_3_flower[num] -= 1
-                    last_time[2] = now_ms
+
+                if (now_ms - last_time[2] >= 1000):
+                    for i, price in enumerate(WORKER_SELL_PRICE):
+                        if worker_3_flower[i] > 0:
+                            coin += price
+                            worker_3_flower[i] -= 1
+                            last_time[2] = now_ms
+                            break
         # ========================
 
         # 이동(월드 좌표)
@@ -459,7 +507,7 @@ while running:
             else:
                 current_bucket_2 = 0
         else:
-            if (worker_2_seed[num] < SEED_STOCK) or (worker_2_flower[num] > 0):
+            if (worker_2_seed[num] < SEED_STOCK) or any(f > 0 for f in worker_2_flower):
                 current_bucket_2 = 0   # 상점
             else:
                 current_bucket_2 = 1
@@ -489,8 +537,8 @@ while running:
                         if (worker_2_seed[num] <= 0):
                             last_time_2[0] = now_ms
                             break
-                        if plants_seat[cul] == 0 and now_ms - last_time_2[0] >= 1000:
-                            plants_seat[cul] = 1
+                        if plants_seat[cul] == PLANT_NONE and now_ms - last_time_2[0] >= 1000:
+                            plants_seat[cul] = PLANT_POTATO
                             if len(plants_time) <= cul:
                                 plants_time.append(0)
                             plants_time[cul] = 1500
@@ -505,10 +553,13 @@ while running:
                         worker_2_seed[num] += 1
                         last_time_2[2] = now_ms
 
-                if worker_2_flower[num] > 0 and (now_ms - last_time_2[1] >= 1000):
-                    coin += 30
-                    worker_2_flower[num] -= 1
-                    last_time_2[1] = now_ms
+                if (now_ms - last_time_2[1] >= 1000):
+                    for i, price in enumerate(WORKER_SELL_PRICE):
+                        if worker_2_flower[i] > 0:
+                            coin += price
+                            worker_2_flower[i] -= 1
+                            last_time_2[1] = now_ms
+                            break
 
         # 이동 처리
         if worker_2_pos_jud == 1:
@@ -616,47 +667,56 @@ while running:
             screen.blit(field_dic, (int(background_x_pos + 1500 + e * 100),
                                     int(background_y_pos - 1560 + d * 100)))
 
-    # 꽃 그리기/수확 처리
+    # 작물 그리기 및 수확 처리
     for d in range(field_num[1]):
         for e in range(field_num[0]):
             index = d * field_num[0] + e
             x_position = int(background_x_pos + 1500 + e * 105)
             y_position = int(background_y_pos - background_height + 600 + d * 100)
 
-            if plants_seat[index] == 1:
+            plant_type = plants_seat[index]
+            if plant_type != PLANT_NONE:
+                images = PLANT_IMAGES[plant_type]
                 if plants_time[index] > 1000:
-                    screen.blit(flower_dic, (x_position, y_position))
+                    screen.blit(images[0], (x_position, y_position))
                 elif plants_time[index] > 100:
-                    screen.blit(flower_dic2, (x_position, y_position))
+                    screen.blit(images[1], (x_position, y_position))
                 elif plants_time[index] > 0:
-                    screen.blit(flower_dic3, (x_position, y_position))
+                    screen.blit(images[2], (x_position, y_position))
                 else:
-                    screen.blit(flower_dic4, (x_position, y_position))
+                    screen.blit(images[3], (x_position, y_position))
 
                     # 플레이어 수동 수확 구역
                     if (-815 - (field_num[0] - 3) * 110 < background_x_pos < -520 and 1855 < background_y_pos < 2125):
                         for a, plant_time in enumerate(plants_time):
                             if plant_time == 0:
-                                plants_seat[a] = 0
+                                p_type = plants_seat[a]
+                                plants_seat[a] = PLANT_NONE
                                 plants_time[a] = 1_000_000_000  # 오류 방지
-                                inventory[1] += 1
-                                inventory_text[1] = inventory_font.render(str(inventory[1]), True, (255, 255, 255))
+                                inv_idx = HARVEST_INDEX.get(p_type)
+                                if inv_idx is not None:
+                                    inventory[inv_idx] += 1
+                                    inventory_text[inv_idx] = inventory_font.render(str(inventory[inv_idx]), True, (255, 255, 255))
                     # 일꾼 자동 수확(밭 도착 상태)
-                    elif woker_3_pos_jud == 0  and worker_3_jud == 1:
+                    elif woker_3_pos_jud == 0 and worker_3_jud == 1:
                         if target_x == target2_x and target_y == target2_y:
                             for a, plant_time in enumerate(plants_time):
                                 if plant_time == 0:
-                                    plants_seat[a] = 0
+                                    p_type = plants_seat[a]
+                                    plants_seat[a] = PLANT_NONE
                                     plants_time[a] = 1_000_000_000  # 오류 방지
-                                    worker_3_flower[0] += 1
+                                    if 1 <= p_type <= 4:
+                                        worker_3_flower[p_type - 1] += 1
 
                     elif worker_2_pos_jud == 0 and worker_2_jud == 1:
                         if target_x_2 == target2_x and target_y_2 == target2_y:
                             for a, plant_time in enumerate(plants_time):
                                 if plant_time == 0:
-                                    plants_seat[a] = 0
+                                    p_type = plants_seat[a]
+                                    plants_seat[a] = PLANT_NONE
                                     plants_time[a] = 1_000_000_000  # 오류 방지
-                                    worker_2_flower[0] += 1
+                                    if 1 <= p_type <= 4:
+                                        worker_2_flower[p_type - 1] += 1
 
     # 일꾼 3 그리기 (월드→스크린 변환 + 정수화)
     if (worker_3_jud == 1):
