@@ -83,6 +83,14 @@ store_UI_unbuy = pygame.image.load(os.path.join(image_path, "store_UI_unbuy.png"
 Button_1 = pygame.image.load(os.path.join(image_path, "1.png"))
 Button_2 = pygame.image.load(os.path.join(image_path, "2.png"))
 Button_3 = pygame.image.load(os.path.join(image_path, "3.png"))
+Button_4 = pygame.image.load(os.path.join(image_path, "4.png"))
+Button_5 = pygame.image.load(os.path.join(image_path, "5.png"))
+Button_6 = pygame.image.load(os.path.join(image_path, "6.png"))
+Button_7 = pygame.image.load(os.path.join(image_path, "7.png"))
+Button_8 = pygame.image.load(os.path.join(image_path, "8.png"))
+Button_9 = pygame.image.load(os.path.join(image_path, "9.png"))
+Button_0 = pygame.image.load(os.path.join(image_path, "0.png"))
+
 Button_f = pygame.image.load(os.path.join(image_path, "F.png"))
 Button_space = pygame.image.load(os.path.join(image_path, "SPACEALTERNATIVE.png"))
 ticket_UI = pygame.image.load(os.path.join(image_path, "ticket.png"))
@@ -119,10 +127,18 @@ worker_1_UI = pygame.transform.scale(worker_1, (worker_1.get_width() * 2, worker
 Button_1_UI = pygame.transform.scale(Button_1, (Button_1.get_width() * 2, Button_1.get_height() * 2))
 Button_2_UI = pygame.transform.scale(Button_2, (Button_2.get_width() * 2, Button_2.get_height() * 2))
 Button_3_UI = pygame.transform.scale(Button_3, (Button_3.get_width() * 2, Button_3.get_height() * 2))
+Button_4_UI = pygame.transform.scale(Button_4, (Button_3.get_width() * 2, Button_3.get_height() * 2))
+Button_5_UI = pygame.transform.scale(Button_5, (Button_3.get_width() * 2, Button_3.get_height() * 2))
+Button_6_UI = pygame.transform.scale(Button_6, (Button_3.get_width() * 2, Button_3.get_height() * 2))
+Button_7_UI = pygame.transform.scale(Button_7, (Button_3.get_width() * 2, Button_3.get_height() * 2))
+Button_8_UI = pygame.transform.scale(Button_8, (Button_3.get_width() * 2, Button_3.get_height() * 2))
+Button_9_UI = pygame.transform.scale(Button_9, (Button_3.get_width() * 2, Button_3.get_height() * 2))
+Button_0_UI = pygame.transform.scale(Button_0, (Button_3.get_width() * 2, Button_3.get_height() * 2))
 Button_f_UI = pygame.transform.scale(Button_f, (Button_f.get_width() * 2, Button_f.get_height() * 2))
 Button_space_UI = pygame.transform.scale(Button_space, (Button_space.get_width() * 2, Button_space.get_height() * 2))
 fish_UI = pygame.transform.scale(fish_png, (fish_png.get_width() //2 , fish_png.get_height() // 2))
 seed_UI = pygame.transform.scale(seed_png, (seed_png.get_width() //2 , seed_png.get_height() // 2))
+flower_UI = pygame.transform.scale(flower_dic4, (seed_png.get_width() //2 , seed_png.get_height() // 2))
 
 # 작물 타입 정의
 PLANT_NONE = 0
@@ -723,7 +739,7 @@ while running:
         worker_3_screen_x = int(background_x_pos + worker_3_world_x)
         worker_3_screen_y = int(background_y_pos + worker_3_world_y)
         screen.blit(worker_3, (worker_3_screen_x, worker_3_screen_y))
-        screen.blit(flower_dic4, (worker_3_screen_x - 30, worker_3_screen_y - 50))
+        screen.blit(flower_UI, (worker_3_screen_x - 30, worker_3_screen_y - 50))
         K_1_text = UI_key_pont.render(str(": {}개".format(worker_3_flower[0])), True, (255, 255, 255))
         screen.blit(K_1_text, (worker_3_screen_x + 10, worker_3_screen_y - 40))
         screen.blit(seed_UI, (worker_3_screen_x - 30, worker_3_screen_y - 100))
@@ -734,7 +750,7 @@ while running:
         worker_2_screen_x = int(background_x_pos + worker_2_world_x)
         worker_2_screen_y = int(background_y_pos + worker_2_world_y)
         screen.blit(worker_2, (worker_2_screen_x, worker_2_screen_y))
-        screen.blit(flower_dic4, (worker_2_screen_x - 30, worker_2_screen_y - 50))
+        screen.blit(flower_UI, (worker_2_screen_x - 30, worker_2_screen_y - 50))
         K_1_text = UI_key_pont.render(str(": {}개".format(worker_2_flower[0])), True, (255, 255, 255))
         screen.blit(K_1_text, (worker_2_screen_x, worker_2_screen_y - 50))
         screen.blit(seed_UI, (worker_2_screen_x - 30, worker_2_screen_y - 100))
@@ -891,6 +907,21 @@ while running:
         K_1_text = UI_key_pont.render(str(": 물고기 먹기"), True, (0, 0, 0))
         screen.blit(K_1_text, (1700, 700))
         screen.blit(Button_3_UI, (1650, 697.5))
+
+    if (inventory[5] > 0):
+        K_1_text = UI_key_pont.render(str(": 토마토 먹기"), True, (0, 0, 0))
+        screen.blit(K_1_text, (1700, 647))
+        screen.blit(Button_6_UI, (1650, 647.5))
+        
+    if (inventory[7] > 0):
+        K_1_text = UI_key_pont.render(str(": 호박 먹기"), True, (0, 0, 0))
+        screen.blit(K_1_text, (1700, 597))
+        screen.blit(Button_6_UI, (1650, 597.5))
+
+    if (inventory[9] > 0):
+        K_1_text = UI_key_pont.render(str(": 밀 먹기"), True, (0, 0, 0))
+        screen.blit(K_1_text, (1700, 547))
+        screen.blit(Button_0_UI, (1650, 547.5))
 
     cul = 0
     if store_jud == 1:
