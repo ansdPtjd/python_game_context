@@ -335,6 +335,51 @@ while running:
                                 inventory_text[0] = inventory_font.render(str(inventory[0]), True, (255, 255, 255))
                                 break
 
+            # 토마토 심기 (플레이어 수동)
+            if event.key == pygame.K_5:
+                if -520 - field_num[0] * 100 < background_x_pos < -520 and 1855 - field_num[1] * 100 < background_y_pos < 2125:
+                    if inventory[4] > 0:
+                        for cul in range(field_num[0] * field_num[1]):
+                            if plants_seat[cul] == 0:
+                                plants_seat[cul] = 2
+                                if len(plants_time) <= cul:
+                                    plants_time.append(0)
+                                plants_time[cul] = 1500
+                                hp -= 0.5
+                                inventory[4] -= 1
+                                inventory_text[4] = inventory_font.render(str(inventory[4]), True, (255, 255, 255))
+                                break
+
+            # 호박 심기 (플레이어 수동)
+            if event.key == pygame.K_7:
+                if -520 - field_num[0] * 100 < background_x_pos < -520 and 1855 - field_num[1] * 100 < background_y_pos < 2125:
+                    if inventory[6] > 0:
+                        for cul in range(field_num[0] * field_num[1]):
+                            if plants_seat[cul] == 0:
+                                plants_seat[cul] = 3
+                                if len(plants_time) <= cul:
+                                    plants_time.append(0)
+                                plants_time[cul] = 1500
+                                hp -= 0.5
+                                inventory[6] -= 1
+                                inventory_text[6] = inventory_font.render(str(inventory[6]), True, (255, 255, 255))
+                                break
+
+            # 밀 심기 (플레이어 수동)
+            if event.key == pygame.K_9:
+                if -520 - field_num[0] * 100 < background_x_pos < -520 and 1855 - field_num[1] * 100 < background_y_pos < 2125:
+                    if inventory[8] > 0:
+                        for cul in range(field_num[0] * field_num[1]):
+                            if plants_seat[cul] == 0:
+                                plants_seat[cul] = 4
+                                if len(plants_time) <= cul:
+                                    plants_time.append(0)
+                                plants_time[cul] = 1500
+                                hp -= 0.5
+                                inventory[8] -= 1
+                                inventory_text[8] = inventory_font.render(str(inventory[8]), True, (255, 255, 255))
+                                break
+
             # 낚시 / 상점 / 일 시작
             if event.key == pygame.K_f:
                 if background_y_pos < -900:
@@ -636,7 +681,7 @@ while running:
                     # 플레이어 수동 수확 구역
                     if (-815 - (field_num[0] - 3) * 110 < background_x_pos < -520 and 1855 < background_y_pos < 2125):
                         for a, plant_time in enumerate(plants_time):
-                            if plant_time == 0:
+                            if plant_time == 0 and plants_seat[a] == 1:
                                 plants_seat[a] = 0
                                 plants_time[a] = 1_000_000_000  # 오류 방지
                                 inventory[1] += 1
@@ -645,7 +690,7 @@ while running:
                     elif woker_3_pos_jud == 0  and worker_3_jud == 1:
                         if target_x == target2_x and target_y == target2_y:
                             for a, plant_time in enumerate(plants_time):
-                                if plant_time == 0:
+                                if plant_time == 0 and plants_seat[a] == 1:
                                     plants_seat[a] = 0
                                     plants_time[a] = 1_000_000_000  # 오류 방지
                                     worker_3_flower[0] += 1
@@ -653,10 +698,112 @@ while running:
                     elif worker_2_pos_jud == 0 and worker_2_jud == 1:
                         if target_x_2 == target2_x and target_y_2 == target2_y:
                             for a, plant_time in enumerate(plants_time):
-                                if plant_time == 0:
+                                if plant_time == 0 and plants_seat[a] == 1:
                                     plants_seat[a] = 0
                                     plants_time[a] = 1_000_000_000  # 오류 방지
                                     worker_2_flower[0] += 1
+
+            elif plants_seat[index] == 2:
+                if plants_time[index] > 1000:
+                    screen.blit(tomato_1, (x_position, y_position))
+                elif plants_time[index] > 100:
+                    screen.blit(tomato_2, (x_position, y_position))
+                elif plants_time[index] > 0:
+                    screen.blit(tomato_3, (x_position, y_position))
+                else:
+                    screen.blit(tomato_4, (x_position, y_position))
+
+                    if (-815 - (field_num[0] - 3) * 110 < background_x_pos < -520 and 1855 < background_y_pos < 2125):
+                        for a, plant_time in enumerate(plants_time):
+                            if plant_time == 0 and plants_seat[a] == 2:
+                                plants_seat[a] = 0
+                                plants_time[a] = 1_000_000_000
+                                inventory[5] += 1
+                                inventory_text[5] = inventory_font.render(str(inventory[5]), True, (255, 255, 255))
+                    elif woker_3_pos_jud == 0 and worker_3_jud == 1:
+                        if target_x == target2_x and target_y == target2_y:
+                            for a, plant_time in enumerate(plants_time):
+                                if plant_time == 0 and plants_seat[a] == 2:
+                                    plants_seat[a] = 0
+                                    plants_time[a] = 1_000_000_000
+                                    inventory[5] += 1
+                                    inventory_text[5] = inventory_font.render(str(inventory[5]), True, (255, 255, 255))
+                    elif worker_2_pos_jud == 0 and worker_2_jud == 1:
+                        if target_x_2 == target2_x and target_y_2 == target2_y:
+                            for a, plant_time in enumerate(plants_time):
+                                if plant_time == 0 and plants_seat[a] == 2:
+                                    plants_seat[a] = 0
+                                    plants_time[a] = 1_000_000_000
+                                    inventory[5] += 1
+                                    inventory_text[5] = inventory_font.render(str(inventory[5]), True, (255, 255, 255))
+
+            elif plants_seat[index] == 3:
+                if plants_time[index] > 1000:
+                    screen.blit(pumpkin_1, (x_position, y_position))
+                elif plants_time[index] > 100:
+                    screen.blit(pumpkin_2, (x_position, y_position))
+                elif plants_time[index] > 0:
+                    screen.blit(pumpkin_3, (x_position, y_position))
+                else:
+                    screen.blit(pumpkin_4, (x_position, y_position))
+
+                    if (-815 - (field_num[0] - 3) * 110 < background_x_pos < -520 and 1855 < background_y_pos < 2125):
+                        for a, plant_time in enumerate(plants_time):
+                            if plant_time == 0 and plants_seat[a] == 3:
+                                plants_seat[a] = 0
+                                plants_time[a] = 1_000_000_000
+                                inventory[7] += 1
+                                inventory_text[7] = inventory_font.render(str(inventory[7]), True, (255, 255, 255))
+                    elif woker_3_pos_jud == 0 and worker_3_jud == 1:
+                        if target_x == target2_x and target_y == target2_y:
+                            for a, plant_time in enumerate(plants_time):
+                                if plant_time == 0 and plants_seat[a] == 3:
+                                    plants_seat[a] = 0
+                                    plants_time[a] = 1_000_000_000
+                                    inventory[7] += 1
+                                    inventory_text[7] = inventory_font.render(str(inventory[7]), True, (255, 255, 255))
+                    elif worker_2_pos_jud == 0 and worker_2_jud == 1:
+                        if target_x_2 == target2_x and target_y_2 == target2_y:
+                            for a, plant_time in enumerate(plants_time):
+                                if plant_time == 0 and plants_seat[a] == 3:
+                                    plants_seat[a] = 0
+                                    plants_time[a] = 1_000_000_000
+                                    inventory[7] += 1
+                                    inventory_text[7] = inventory_font.render(str(inventory[7]), True, (255, 255, 255))
+
+            elif plants_seat[index] == 4:
+                if plants_time[index] > 1000:
+                    screen.blit(wheat_1, (x_position, y_position))
+                elif plants_time[index] > 100:
+                    screen.blit(wheat_2, (x_position, y_position))
+                elif plants_time[index] > 0:
+                    screen.blit(wheat_3, (x_position, y_position))
+                else:
+                    screen.blit(wheat_4, (x_position, y_position))
+
+                    if (-815 - (field_num[0] - 3) * 110 < background_x_pos < -520 and 1855 < background_y_pos < 2125):
+                        for a, plant_time in enumerate(plants_time):
+                            if plant_time == 0 and plants_seat[a] == 4:
+                                plants_seat[a] = 0
+                                plants_time[a] = 1_000_000_000
+                                inventory[9] += 1
+                                inventory_text[9] = inventory_font.render(str(inventory[9]), True, (255, 255, 255))
+                    elif woker_3_pos_jud == 0 and worker_3_jud == 1:
+                        if target_x == target2_x and target_y == target2_y:
+                            for a, plant_time in enumerate(plants_time):
+                                if plant_time == 0 and plants_seat[a] == 4:
+                                    plants_seat[a] = 0
+                                    plants_time[a] = 1_000_000_000
+                                    inventory[9] += 1
+                                    inventory_text[9] = inventory_font.render(str(inventory[9]), True, (255, 255, 255))
+                    elif worker_2_pos_jud == 0 and worker_2_jud == 1:
+                        if target_x_2 == target2_x and target_y_2 == target2_y:
+                            for a, plant_time in enumerate(plants_time):
+                                if plant_time == 0 and plants_seat[a] == 4:
+                                    plants_seat[a] = 0
+                                    plants_time[a] = 1_000_000_000
+                                    inventory[9] += 1
+                                    inventory_text[9] = inventory_font.render(str(inventory[9]), True, (255, 255, 255))
 
     # 일꾼 3 그리기 (월드→스크린 변환 + 정수화)
     if (worker_3_jud == 1):
