@@ -214,6 +214,7 @@ to_x = 0
 to_y = 0
 background_speed = 1
 mini_game_1 = 0
+store_index = 0
 
 # NPC 월드 좌표 (카메라와 분리)
 worker_3_world_x = 1500
@@ -833,52 +834,107 @@ while running:
 
     cul = 0
     if store_jud == 1:
+        
         store_UI_y_pos -= 100
         screen.blit(store_UI, (store_UI_x_pos - store_UI_width / 2, store_UI_y_pos - store_UI_height / 2))
         screen.blit(store_ESC, (store_UI_x_pos - store_UI_width / 2, store_UI_y_pos - store_UI_height / 2))
         store_UI_x_pos -= 90
         store_UI_y_pos -= 50
 
-        # 아이템 아이콘 표시
-        screen.blit(flower_png, (store_UI_x_pos - store_UI_width / 2 + 90, store_UI_y_pos - store_UI_height / 2 + 230))
-        screen.blit(seed_png, (store_UI_x_pos - store_UI_width / 2 + 90, store_UI_y_pos - store_UI_height / 2 + 480))
-        screen.blit(fish_png, (store_UI_x_pos - store_UI_width / 2 + 90, store_UI_y_pos - store_UI_height / 2 + 730))
-        screen.blit(field_png, (store_UI_x_pos - store_UI_width / 2 + 1000, store_UI_y_pos - store_UI_height / 2 + 230))
-        screen.blit(ticket_UI, (store_UI_x_pos - store_UI_width / 2 + 1000, store_UI_y_pos - store_UI_height / 2 + 505))
+        if (store_index == 0):
+            screen.blit(right_button, (store_UI_x_pos - store_UI_width / 2 + 1675, store_UI_y_pos - store_UI_height / 2 + 200 + 275))
+            
+            # 아이템 아이콘 표시
+            screen.blit(flower_png, (store_UI_x_pos - store_UI_width / 2 + 90, store_UI_y_pos - store_UI_height / 2 + 230))
+            screen.blit(seed_png, (store_UI_x_pos - store_UI_width / 2 + 90, store_UI_y_pos - store_UI_height / 2 + 480))
+            screen.blit(fish_png, (store_UI_x_pos - store_UI_width / 2 + 90, store_UI_y_pos - store_UI_height / 2 + 730))
+            screen.blit(field_png, (store_UI_x_pos - store_UI_width / 2 + 1000, store_UI_y_pos - store_UI_height / 2 + 230))
+            screen.blit(ticket_UI, (store_UI_x_pos - store_UI_width / 2 + 1000, store_UI_y_pos - store_UI_height / 2 + 505))
 
-        # 가격 텍스트 생성
-        flower_buy_text = inventory_font.render("50 coin", True, (255, 255, 255))
-        flower_sell_text = inventory_font.render("30 coin", True, (255, 255, 255))
-        seed_buy_text = inventory_font.render("10 coin", True, (255, 255, 255))
-        seed_sell_text = inventory_font.render("5 coin", True, (255, 255, 255))
-        fish_buy_text = inventory_font.render("200 coin", True, (255, 255, 255))
-        fish_sell_text = inventory_font.render("100 coin", True, (255, 255, 255))
-        field_price = str(field_num[1] * 500) + " coin"
-        field_buy_text = inventory_font.render(field_price, True, (255, 255, 255))
-        ticket_buy_text = inventory_font.render("500 coin", True, (255, 255, 255))
+            # 가격 텍스트 생성
+            flower_buy_text = inventory_font.render("50 coin", True, (255, 255, 255))
+            flower_sell_text = inventory_font.render("30 coin", True, (255, 255, 255))
+            seed_buy_text = inventory_font.render("10 coin", True, (255, 255, 255))
+            seed_sell_text = inventory_font.render("5 coin", True, (255, 255, 255))
+            fish_buy_text = inventory_font.render("200 coin", True, (255, 255, 255))
+            fish_sell_text = inventory_font.render("100 coin", True, (255, 255, 255))
+            field_price = str(field_num[1] * 500) + " coin"
+            field_buy_text = inventory_font.render(field_price, True, (255, 255, 255))
+            ticket_buy_text = inventory_font.render("500 coin", True, (255, 255, 255))
 
-        # 구매 및 판매 UI 그리기
-        for i in range(3):  # 꽃, 씨앗, 물고기
-            screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
-            screen.blit(store_UI_sell, (store_UI_x_pos - store_UI_width / 2 + 500, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
-            cul += 1
-        cul = 0
+            # 구매 및 판매 UI 그리기
+            for i in range(3):  # 꽃, 씨앗, 물고기
+                screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
+                screen.blit(store_UI_sell, (store_UI_x_pos - store_UI_width / 2 + 500, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
+                cul += 1
+            cul = 0
 
-        # 땅 구매 UI
-        screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 1200, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
-        screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 1200, store_UI_y_pos - store_UI_height / 2 + 200 + 250))
+            # 땅 구매 UI
+            screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 1200, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
+            screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 1200, store_UI_y_pos - store_UI_height / 2 + 200 + 250))
 
-        # 가격 텍스트 표시
-        screen.blit(flower_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 180))
-        screen.blit(flower_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 180))
-        screen.blit(seed_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 430))
-        screen.blit(seed_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 430))
-        screen.blit(fish_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 680))
-        screen.blit(fish_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 680))
-        screen.blit(field_buy_text, (store_UI_x_pos - store_UI_width / 2 + 1210, store_UI_y_pos - store_UI_height / 2 + 180))
-        screen.blit(ticket_buy_text, (store_UI_x_pos - store_UI_width / 2 + 1210, store_UI_y_pos - store_UI_height / 2 + 430))
+            # 가격 텍스트 표시
+            screen.blit(flower_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 180))
+            screen.blit(flower_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 180))
+            screen.blit(seed_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 430))
+            screen.blit(seed_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 430))
+            screen.blit(fish_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 680))
+            screen.blit(fish_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 680))
+            screen.blit(field_buy_text, (store_UI_x_pos - store_UI_width / 2 + 1210, store_UI_y_pos - store_UI_height / 2 + 180))
+            screen.blit(ticket_buy_text, (store_UI_x_pos - store_UI_width / 2 + 1210, store_UI_y_pos - store_UI_height / 2 + 430))
+            
+        else:
+            screen.blit(left_button, (store_UI_x_pos - store_UI_width / 2 - 50, store_UI_y_pos - store_UI_height / 2 + 200 + 275))
+            screen.blit(tomato_4, (store_UI_x_pos - store_UI_width / 2 + 90, store_UI_y_pos - store_UI_height / 2 + 230))
+            screen.blit(tomato_seed_UI, (store_UI_x_pos - store_UI_width / 2 + 90, store_UI_y_pos - store_UI_height / 2 + 480))
+            screen.blit(wheat_4, (store_UI_x_pos - store_UI_width / 2 + 90, store_UI_y_pos - store_UI_height / 2 + 730))
+            screen.blit(wheat_seed_UI, (store_UI_x_pos - store_UI_width / 2 + 800, store_UI_y_pos - store_UI_height / 2 + 230))
+            screen.blit(pumpkin_4, (store_UI_x_pos - store_UI_width / 2 + 800, store_UI_y_pos - store_UI_height / 2 + 480))
+            screen.blit(pumpkin_seed_UI, (store_UI_x_pos - store_UI_width / 2 + 800, store_UI_y_pos - store_UI_height / 2 + 730))
 
+            # 가격 텍스트 생성
+            tomato_buy_text = inventory_font.render("100 coin", True, (255, 255, 255))
+            tomato_sell_text = inventory_font.render("90 coin", True, (255, 255, 255))
+            tomato_seed_buy_text = inventory_font.render("20 coin", True, (255, 255, 255))
+            tomato_seed_sell_text = inventory_font.render("15 coin", True, (255, 255, 255))
+            wheat_buy_text = inventory_font.render("200 coin", True, (255, 255, 255))
+            wheat_sell_text = inventory_font.render("100 coin", True, (255, 255, 255))
+            wheat_seed_buy_text = inventory_font.render("30 coin", True, (255, 255, 255))
+            wheat_seed_sell_text = inventory_font.render("25 coin", True, (255, 255, 255))
+            pumpkin_buy_text = inventory_font.render("250 coin", True, (255, 255, 255))
+            pumpkin_sell_text = inventory_font.render("200 coin", True, (255, 255, 255))
+            pumpkin_seed_buy_text = inventory_font.render("100 coin", True, (255, 255, 255))
+            pumpkin_seed_sell_text = inventory_font.render("90 coin", True, (255, 255, 255))
 
+            # 구매 및 판매 UI 그리기
+            for i in range(3):  # 꽃, 씨앗, 물고기
+                screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
+                screen.blit(store_UI_sell, (store_UI_x_pos - store_UI_width / 2 + 500, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
+                cul += 1
+            cul = 0
+
+            # 땅 구매 UI
+            for i in range(3):  # 꽃, 씨앗, 물고기
+                screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 900, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
+                screen.blit(store_UI_sell, (store_UI_x_pos - store_UI_width / 2 + 1210, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
+                cul += 1
+            cul = 0
+
+            # 가격 텍스트 표시
+            screen.blit(tomato_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 180))
+            screen.blit(tomato_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 180))
+            screen.blit(tomato_seed_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 430))
+            screen.blit(tomato_seed_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 430))
+            screen.blit(wheat_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 680))
+            screen.blit(wheat_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 680))
+
+            screen.blit(wheat_seed_buy_text, (store_UI_x_pos - store_UI_width / 2 + 910, store_UI_y_pos - store_UI_height / 2 + 180))
+            screen.blit(wheat_seed_sell_text, (store_UI_x_pos - store_UI_width / 2 + 1220, store_UI_y_pos - store_UI_height / 2 + 180))
+            screen.blit(pumpkin_buy_text, (store_UI_x_pos - store_UI_width / 2 + 910, store_UI_y_pos - store_UI_height / 2 + 430))
+            screen.blit(pumpkin_sell_text, (store_UI_x_pos - store_UI_width / 2 + 1220, store_UI_y_pos - store_UI_height / 2 + 430))
+            screen.blit(pumpkin_seed_buy_text, (store_UI_x_pos - store_UI_width / 2 + 910, store_UI_y_pos - store_UI_height / 2 + 680))
+            screen.blit(pumpkin_seed_sell_text, (store_UI_x_pos - store_UI_width / 2 + 1220, store_UI_y_pos - store_UI_height / 2 + 680))
+        
         # UI 위치 초기화
         store_UI_x_pos = 975
         store_UI_y_pos = 575
@@ -890,55 +946,124 @@ while running:
                     if store_UI_y_pos - store_UI_height / 2 - 100 < pygame.mouse.get_pos()[1] < store_UI_y_pos - store_UI_height / 2:
                         store_jud = 0
 
-                # 아이템 구매 및 판매 처리
-                for cul in range(3):  # 0: 꽃, 1: 씨앗, 2: 물고기
-                    if 290 < pygame.mouse.get_pos()[0] < 590:  # buy 영역
-                        if cul * 250 + 200 < pygame.mouse.get_pos()[1] < cul * 250 + 350:
-                            if cul == 0:  # 꽃
-                                if coin >= 50:
-                                    inventory[1] += 1
-                                    coin -= 50
-                            elif cul == 1:  # 씨앗
-                                if coin >= 10:
-                                    inventory[0] += 1
-                                    coin -= 10
-                            elif cul == 2:  # 물고기
-                                if coin >= 200:
-                                    inventory[2] += 1
-                                    coin -= 200
+                if 1785 < pygame.mouse.get_pos()[0] < 1885 and 475 < pygame.mouse.get_pos()[1] < 575:
+                    store_index = 1
+                elif 60 < pygame.mouse.get_pos()[0] < 160 and 475 < pygame.mouse.get_pos()[1] < 575:
+                    store_index = 0
 
-                    elif 600 < pygame.mouse.get_pos()[0] < 900:  # sell 영역
-                        if cul * 250 + 200 < pygame.mouse.get_pos()[1] < cul * 250 + 350:
-                            if cul == 0:  # 꽃
-                                if inventory[1] >= 1:
-                                    inventory[1] -= 1
-                                    coin += 30
-                            elif cul == 1:  # 씨앗
-                                if inventory[0] >= 1:
-                                    inventory[0] -= 1
-                                    coin += 5
-                            elif cul == 2:  # 물고기
-                                if inventory[2] >= 1:
-                                    inventory[2] -= 1
-                                    coin += 100
+                if (store_index == 0):
+                    # 아이템 구매 및 판매 처리
+                    for cul in range(3):  # 0: 꽃, 1: 씨앗, 2: 물고기
+                        if 290 < pygame.mouse.get_pos()[0] < 590:  # buy 영역
+                            if cul * 250 + 200 < pygame.mouse.get_pos()[1] < cul * 250 + 350:
+                                if cul == 0:  # 꽃
+                                    if coin >= 50:
+                                        inventory[1] += 1
+                                        coin -= 50
+                                elif cul == 1:  # 씨앗
+                                    if coin >= 10:
+                                        inventory[0] += 1
+                                        coin -= 10
+                                elif cul == 2:  # 물고기
+                                    if coin >= 200:
+                                        inventory[2] += 1
+                                        coin -= 200
 
-                # 땅 구매 처리
-                if 1300 < pygame.mouse.get_pos()[0] < 1600:  # buy 영역
-                    if 200 < pygame.mouse.get_pos()[1] < 300:  # 땅 구매 클릭 영역
-                        if field_num[0] == field_num[1]:
-                            if field_num[1] * 500 <= coin:
-                                coin -= field_num[1] * 500
-                                field_num[0] += 1
-                        else:
-                            if field_num[0] * 500 <= coin:
-                                coin -= field_num[1] * 500
-                                field_num[1] += 1
+                        elif 600 < pygame.mouse.get_pos()[0] < 900:  # sell 영역
+                            if cul * 250 + 200 < pygame.mouse.get_pos()[1] < cul * 250 + 350:
+                                if cul == 0:  # 꽃
+                                    if inventory[1] >= 1:
+                                        inventory[1] -= 1
+                                        coin += 30
+                                elif cul == 1:  # 씨앗
+                                    if inventory[0] >= 1:
+                                        inventory[0] -= 1
+                                        coin += 5
+                                elif cul == 2:  # 물고기
+                                    if inventory[2] >= 1:
+                                        inventory[2] -= 1
+                                        coin += 100
 
-                if 1300 < pygame.mouse.get_pos()[0] < 1600:  # buy 영역
-                    if 450 < pygame.mouse.get_pos()[1] < 550:  # ticket
-                        if coin >= 500:
-                                    inventory[3] += 1
-                                    coin -= 500
+                    # 땅 구매 처리
+                    if 1300 < pygame.mouse.get_pos()[0] < 1600:  # buy 영역
+                        if 200 < pygame.mouse.get_pos()[1] < 300:  # 땅 구매 클릭 영역
+                            if field_num[0] == field_num[1]:
+                                if field_num[1] * 500 <= coin:
+                                    coin -= field_num[1] * 500
+                                    field_num[0] += 1
+                            else:
+                                if field_num[0] * 500 <= coin:
+                                    coin -= field_num[1] * 500
+                                    field_num[1] += 1
+
+                    if 1300 < pygame.mouse.get_pos()[0] < 1600:  # buy 영역
+                        if 450 < pygame.mouse.get_pos()[1] < 550:  # ticket
+                            if coin >= 500:
+                                        inventory[3] += 1
+                                        coin -= 500
+                
+                else:
+                    for cul in range(3):
+                        if 290 < pygame.mouse.get_pos()[0] < 590:  # buy 영역
+                            if cul * 250 + 200 < pygame.mouse.get_pos()[1] < cul * 250 + 350:
+                                if cul == 0:
+                                    if coin >= 100:
+                                        inventory[5] += 1
+                                        coin -= 100
+                                elif cul == 1:
+                                    if coin >= 20:
+                                        inventory[4] += 1
+                                        coin -= 20
+                                elif cul == 2:
+                                    if coin >= 200:
+                                        inventory[9] += 1
+                                        coin -= 200
+
+                        elif 600 < pygame.mouse.get_pos()[0] < 900:  # sell 영역
+                            if cul * 250 + 200 < pygame.mouse.get_pos()[1] < cul * 250 + 350:
+                                if cul == 0: 
+                                    if inventory[5] >= 1:
+                                        inventory[5] -= 1
+                                        coin += 90
+                                elif cul == 1:
+                                    if inventory[4] >= 1:
+                                        inventory[4] -= 1
+                                        coin += 15
+                                elif cul == 2:
+                                    if inventory[9] >= 1:
+                                        inventory[9] -= 1
+                                        coin += 100
+
+                    for cul in range(3):
+                        if 1010 < pygame.mouse.get_pos()[0] < 1310:  # buy 영역
+                            if cul * 250 + 200 < pygame.mouse.get_pos()[1] < cul * 250 + 350:
+                                if cul == 0:
+                                    if coin >= 30:
+                                        inventory[8] += 1
+                                        coin -= 30
+                                elif cul == 1:
+                                    if coin >= 250:
+                                        inventory[7] += 1
+                                        coin -= 250
+                                elif cul == 2:
+                                    if coin >= 100:
+                                        inventory[6] += 1
+                                        coin -= 100
+
+                        elif 1310 < pygame.mouse.get_pos()[0] < 1610:  # sell 영역
+                            if cul * 250 + 200 < pygame.mouse.get_pos()[1] < cul * 250 + 350:
+                                if cul == 0: 
+                                    if inventory[8] >= 1:
+                                        inventory[8] -= 1
+                                        coin += 25
+                                elif cul == 1:
+                                    if inventory[7] >= 1:
+                                        inventory[7] -= 1
+                                        coin += 200
+                                elif cul == 2:
+                                    if inventory[6] >= 1:
+                                        inventory[6] -= 1
+                                        coin += 90
 
     # 일 (워커 구입 UI)
     if work_jud == 1:

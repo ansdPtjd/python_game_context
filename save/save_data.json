@@ -1,14 +1,14 @@
 {
-    "coin": 120,
+    "coin": 10510,
     "seed": 1,
     "flower": 0,
     "fish": 0,
     "field_x": 3,
     "field_y": 3,
-    "hp": 90,
+    "hp": 44,
     "plants_time": [
-        999944652,
-        999944652
+        999881800,
+        999881800
     ],
     "plants_seat": [
         0,
