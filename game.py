@@ -218,7 +218,7 @@ gameover_font = pygame.font.Font(pixel_pont_path, 100)
 inventory_font = pygame.font.Font(pixel_pont_path, 25)
 UI_font = pygame.font.Font(pixel_pont_path, 50)
 gameover_text = gameover_font.render(str("[피로도에 의해 캐릭터가 기절했습니다.]"), True, (255, 0, 0))
-succes_text = game_font.render(str("[성공!.]"), True, (0, 0, 0))
+succes_text = game_font.render(str("성공!"), True, (0, 0, 0))
 UI_key_pont = pygame.font.Font(pixel_pont_path, 25)
 
 # 리스트
@@ -271,6 +271,8 @@ to_y = 0
 background_speed = 1
 mini_game_1 = 0
 store_index = 0
+success_start_time = 0
+success_display = False
 
 # NPC 월드 좌표 (카메라와 분리)
 worker_3_world_x = 1500
@@ -855,6 +857,19 @@ while running:
         fish = 0
         cul2 = 0
         fish_x_pul = 0
+
+        if fish_point == 1:
+            success_display = True
+            success_start_time = pygame.time.get_ticks()   # ← now_ms 말고, 지금 시각을 새로 읽기
+            fish_point = 0
+
+        if success_display:
+            elapsed = pygame.time.get_ticks() - success_start_time
+            if elapsed < 1000:  # 1000ms = 1초 동안 표시 (원하면 2000, 3000으로 늘려도 됨)
+                text_rect = succes_text.get_rect(center=(screen_width // 2, screen_height // 2))
+                screen.blit(succes_text, text_rect)
+            else:
+                success_display = False
 
     screen.blit(inventory_png, (315, 940))
     screen.blit(seed_png, (330, 960))
