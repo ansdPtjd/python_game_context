@@ -218,6 +218,7 @@ gameover_font = pygame.font.Font(pixel_pont_path, 100)
 inventory_font = pygame.font.Font(pixel_pont_path, 25)
 UI_font = pygame.font.Font(pixel_pont_path, 50)
 gameover_text = gameover_font.render(str("[피로도에 의해 캐릭터가 기절했습니다.]"), True, (255, 0, 0))
+succes_text = game_font.render(str("[성공!.]"), True, (0, 0, 0))
 UI_key_pont = pygame.font.Font(pixel_pont_path, 25)
 
 # 리스트
@@ -874,7 +875,7 @@ while running:
         cul += 1
 
     if (-815 - (field_num[0] - 3) * 110 < background_x_pos < -520 and 1855 < background_y_pos < 2125 and inventory[0] > 0):
-        K_1_text = UI_key_pont.render(str(": 해바라기 심기"), True, (0, 0, 0))
+        K_1_text = UI_key_pont.render(str(": 감자 심기"), True, (0, 0, 0))
         screen.blit(K_1_text, (1700, 900))
         screen.blit(Button_1_UI, (1650, 897.5))
 
@@ -899,7 +900,7 @@ while running:
         screen.blit(Button_f_UI, (1650, 847.5))
 
     if (inventory[1] > 0):
-        K_1_text = UI_key_pont.render(str(": 해바라기 먹기"), True, (0, 0, 0))
+        K_1_text = UI_key_pont.render(str(": 감자 먹기"), True, (0, 0, 0))
         screen.blit(K_1_text, (1700, 750))
         screen.blit(Button_2_UI, (1650, 747.5))
 
@@ -1179,11 +1180,11 @@ while running:
             screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200))
         else:
             screen.blit(store_UI_unbuy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200))
-        if (worker_3_jud == 0):
+        if (worker_2_jud == 0):
             screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + 250))
         else:
             screen.blit(store_UI_unbuy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + 250))
-        if (worker_3_jud == 0):
+        if (worker_1_jud == 0):
             screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + 500))
         else:
             screen.blit(store_UI_unbuy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + 500))
@@ -1286,12 +1287,12 @@ data = {
     "worker_1_jud": worker_1_jud,
     "worker_1_fish": worker_1_fish,
     "ticket" : inventory[3],
-    "tomato" : tomato,
-    "tomato_seed" : tomato_seed,
-    "pumpkin" : pumpkin,
-    "pumpkin_seed" : pumpkin_seed,
-    "wheat" : wheat,
-    "wheat_seed" : wheat_seed,
+    "tomato" : inventory[5],
+    "tomato_seed" : inventory[4],
+    "pumpkin" : inventory[7],
+    "pumpkin_seed" : inventory[6],
+    "wheat" : inventory[9],
+    "wheat_seed" : inventory[8],
 }
 with open(save_file, "w", encoding="utf8") as f:
     json.dump(data, f, ensure_ascii=False, indent=4)
