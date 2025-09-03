@@ -419,8 +419,20 @@ while running:
                     inventory[1] -= 1
             elif event.key == pygame.K_3:
                 if inventory[2] >= 1 and hp < 100:
-                    hp += 2
+                    hp += 5
                     inventory[2] -= 1
+            elif event.key == pygame.K_6:
+                if inventory[5] >= 1 and hp < 100:
+                    hp += 3
+                    inventory[5] -= 1
+            elif event.key == pygame.K_0:
+                if inventory[9] >= 1 and hp < 100:
+                    hp += 5
+                    inventory[9] -= 1
+            elif event.key == pygame.K_8:
+                if inventory[7] >= 1 and hp < 100:
+                    hp += 10
+                    inventory[7] -= 1
 
         if event.type == pygame.KEYUP:
             if event.key in [pygame.K_a, pygame.K_d]:
@@ -1246,11 +1258,9 @@ while running:
         store_UI_y_pos -= 50
 
         # 아이템 아이콘 표시
-        screen.blit(mini_game_1_UI, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 275))
+        screen.blit(mini_game_1_UI, (store_UI_x_pos - 50, store_UI_y_pos - store_UI_height / 2 + 275))
 
-        screen.blit(ticket_UI, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 200))
-
-        screen.blit(play_button, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 600))
+        screen.blit(play_button, (store_UI_x_pos - 50, store_UI_y_pos - store_UI_height / 2 + 600))
 
         # UI 위치 초기화
         store_UI_x_pos = 975
