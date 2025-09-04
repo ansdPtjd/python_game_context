@@ -31,10 +31,14 @@ save_path = (py_path + r'/save')
 save_file = str(save_path + r'/mini_game_1.json')
 music_path = (py_path + r'/music')
 
+def load_image(name):
+    """이미지를 로드하여 alpha 변환 후 반환한다."""
+    return pygame.image.load(os.path.join(image_path, f"{name}.png")).convert_alpha()
+
 # 이미지 로드
-character = pygame.image.load(os.path.join(image_path, "mini_game_spaceship.png"))
-enemy = pygame.image.load(os.path.join(image_path, "mini_game_enemy_spaceship.png"))
-background = pygame.image.load(os.path.join(image_path, "mini_game_backgroud.png"))
+character = load_image("mini_game_spaceship")
+enemy = load_image("mini_game_enemy_spaceship")
+background = load_image("mini_game_backgroud")
 
 # 마스크
 player_mask_base = pygame.mask.from_surface(character)
@@ -142,7 +146,7 @@ while running:
     screen.blit(character, (character_x_pos, character_y_pos))
     for e in enemies:
         screen.blit(e["img"], e["rect"].topleft)
-    score_text = score_font.render(str(score + "점"), True, (0, 0, 0))
+    score_text = score_font.render(str("{0}점".format(score)), True, (0, 0, 0))
     screen.blit(score_text, (600, 0))
     pygame.display.update()
 

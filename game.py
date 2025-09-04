@@ -32,6 +32,7 @@ pygame.display.set_caption("Horizon")
 
 # FPS 관리를 위한 시계 객체
 clock = pygame.time.Clock()
+FPS = 144
 ##############################################################
 
 # 1. 사용자 게임 초기화 (배경 화면, 게임 이미지, 좌표, 속도, 폰트 등)
@@ -44,96 +45,93 @@ music_path = (py_path + r'/music')
 save_file = str(save_path + r'/save_data.json')
 save_file_mini_game_1 = str(save_path + r'/mini_game_1.json')
 
+def load_image(name):
+    """이미지를 로드하여 alpha 변환 후 반환한다."""
+    return pygame.image.load(os.path.join(image_path, f"{name}.png")).convert_alpha()
+
 # 이미지 로드
-background = pygame.image.load(os.path.join(image_path, "background.png"))
-background_reset = pygame.image.load(os.path.join(image_path, "background1.png"))
-fishing1 = pygame.image.load(os.path.join(image_path, "fishing.png"))
-fishing2 = pygame.image.load(os.path.join(image_path, "fishing.png"))
-fishing3 = pygame.image.load(os.path.join(image_path, "fishing.png"))
-fishing4 = pygame.image.load(os.path.join(image_path, "fishing.png"))
-gameover = pygame.image.load(os.path.join(image_path, "gameover.png"))
-field_dic = pygame.image.load(os.path.join(image_path, "field.png"))
-sand = pygame.image.load(os.path.join(image_path, "sand.png"))
-flower_dic = pygame.image.load(os.path.join(image_path, "potato_1.png"))
-flower_dic2 = pygame.image.load(os.path.join(image_path, "potato_2.png"))
-flower_dic3 = pygame.image.load(os.path.join(image_path, "potato_3.png"))
-flower_dic4 = pygame.image.load(os.path.join(image_path, "potato_4.png"))
-sand2 = pygame.image.load(os.path.join(image_path, "sand2.png"))
-house = pygame.image.load(os.path.join(image_path, "house.png"))
-fish_gage_bar = pygame.image.load(os.path.join(image_path, "gage_bar.png"))
-fish_gage_bar_select = pygame.image.load(os.path.join(image_path, "gage_bar_select.png"))
-store = pygame.image.load(os.path.join(image_path, "store.png"))
-character = pygame.image.load(os.path.join(image_path, "character.png"))
-fish_tool = pygame.image.load(os.path.join(image_path, "fish_tool.png"))
-fish_tool2 = pygame.image.load(os.path.join(image_path, "fish_tool1.png"))
-coin_png = pygame.image.load(os.path.join(image_path, "coin.png"))
-inventory_png = pygame.image.load(os.path.join(image_path, "inventory.png"))
-seed_png = pygame.image.load(os.path.join(image_path, "potato_seed.png"))
-flower_png = pygame.image.load(os.path.join(image_path, "potato_4.png"))
-fish_png = pygame.image.load(os.path.join(image_path, "fish.png"))
-field_png = pygame.image.load(os.path.join(image_path, "field.png"))
-store_ESC = pygame.image.load(os.path.join(image_path, "ESC.png"))
-store_UI_buy = pygame.image.load(os.path.join(image_path, "store_UI_buy.png"))
-store_UI_sell = pygame.image.load(os.path.join(image_path, "store_UI_sell.png"))
-store_UI = pygame.image.load(os.path.join(image_path, "store_ui.png"))
-worker_3 = pygame.image.load(os.path.join(image_path, "worker_3.png"))
-worker_2 = pygame.image.load(os.path.join(image_path, "worker_2.png"))
-worker_1 = pygame.image.load(os.path.join(image_path, "worker_1.png"))
-store_UI_unbuy = pygame.image.load(os.path.join(image_path, "store_UI_unbuy.png"))
-Button_1 = pygame.image.load(os.path.join(image_path, "1.png"))
-Button_2 = pygame.image.load(os.path.join(image_path, "2.png"))
-Button_3 = pygame.image.load(os.path.join(image_path, "3.png"))
-Button_4 = pygame.image.load(os.path.join(image_path, "4.png"))
-Button_5 = pygame.image.load(os.path.join(image_path, "5.png"))
-Button_6 = pygame.image.load(os.path.join(image_path, "6.png"))
-Button_7 = pygame.image.load(os.path.join(image_path, "7.png"))
-Button_8 = pygame.image.load(os.path.join(image_path, "8.png"))
-Button_9 = pygame.image.load(os.path.join(image_path, "9.png"))
-Button_0 = pygame.image.load(os.path.join(image_path, "0.png"))
+background = load_image("background")
+background_reset = load_image("background1")
+fishing = load_image("fishing")
+fishing1 = fishing2 = fishing3 = fishing4 = fishing
+gameover = load_image("gameover")
+field_dic = load_image("field")
+sand = load_image("sand")
+flower_dic = load_image("potato_1")
+flower_dic2 = load_image("potato_2")
+flower_dic3 = load_image("potato_3")
+flower_dic4 = load_image("potato_4")
+sand2 = load_image("sand2")
+house = load_image("house")
+work = load_image("work")
+fish_gage_bar = load_image("gage_bar")
+fish_gage_bar_select = load_image("gage_bar_select")
+store = load_image("store")
+fountain = load_image("base")
+character = load_image("character")
+fish_tool = load_image("fish_tool")
+fish_tool2 = load_image("fish_tool1")
+coin_png = load_image("coin")
+inventory_png = load_image("inventory")
+seed_png = load_image("potato_seed")
+flower_png = load_image("potato_4")
+fish_png = load_image("fish")
+field_png = load_image("field")
+store_ESC = load_image("ESC")
+store_UI_buy = load_image("store_UI_buy")
+store_UI_sell = load_image("store_UI_sell")
+do_button = load_image("do_button")
+store_UI = load_image("store_ui")
+worker_3 = load_image("worker_3")
+worker_2 = load_image("worker_2")
+worker_1 = load_image("worker_1")
+store_UI_unbuy = load_image("store_UI_unbuy")
 
-Button_f = pygame.image.load(os.path.join(image_path, "F.png"))
-Button_space = pygame.image.load(os.path.join(image_path, "SPACEALTERNATIVE.png"))
-ticket_UI = pygame.image.load(os.path.join(image_path, "ticket.png"))
-mini_game_1_UI = pygame.image.load(os.path.join(image_path, "mini_game_1.png"))
-play_button = pygame.image.load(os.path.join(image_path, "play_button.png"))
-mini_game_icon = pygame.image.load(os.path.join(image_path, "mini_game_icon.png"))
+# 숫자 버튼 이미지 일괄 로드
+number_buttons = [load_image(str(i)) for i in range(10)]
+Button_0, Button_1, Button_2, Button_3, Button_4, Button_5, Button_6, Button_7, Button_8, Button_9 = number_buttons
 
-tomato_1 = pygame.image.load(os.path.join(image_path, "tomato_1.png"))
-tomato_2 = pygame.image.load(os.path.join(image_path, "tomato_2.png"))
-tomato_3 = pygame.image.load(os.path.join(image_path, "tomato_3.png"))
-tomato_4 = pygame.image.load(os.path.join(image_path, "tomato_4.png"))
-tomato_seed_UI = pygame.image.load(os.path.join(image_path, "tomato_seed.png"))
+Button_f = load_image("F")
+Button_space = load_image("SPACEALTERNATIVE")
+ticket_UI = load_image("ticket")
+mini_game_1_UI = load_image("mini_game_1")
+play_button = load_image("play_button")
+mini_game_icon = load_image("mini_game_icon")
 
-pumpkin_1 = pygame.image.load(os.path.join(image_path, "pumpkin_1.png"))
-pumpkin_2 = pygame.image.load(os.path.join(image_path, "pumpkin_2.png"))
-pumpkin_3 = pygame.image.load(os.path.join(image_path, "pumpkin_3.png"))
-pumpkin_4 = pygame.image.load(os.path.join(image_path, "pumpkin_4.png"))
-pumpkin_seed_UI  = pygame.image.load(os.path.join(image_path, "pumpkin_seed.png"))
+tomato_1 = load_image("tomato_1")
+tomato_2 = load_image("tomato_2")
+tomato_3 = load_image("tomato_3")
+tomato_4 = load_image("tomato_4")
+tomato_seed_UI = load_image("tomato_seed")
 
-wheat_1 = pygame.image.load(os.path.join(image_path, "wheat_1.png"))
-wheat_2 = pygame.image.load(os.path.join(image_path, "wheat_2.png"))
-wheat_3 = pygame.image.load(os.path.join(image_path, "wheat_3.png"))
-wheat_4 = pygame.image.load(os.path.join(image_path, "wheat_4.png"))
-wheat_seed_UI  = pygame.image.load(os.path.join(image_path, "wheat_seed.png"))
+pumpkin_1 = load_image("pumpkin_1")
+pumpkin_2 = load_image("pumpkin_2")
+pumpkin_3 = load_image("pumpkin_3")
+pumpkin_4 = load_image("pumpkin_4")
+pumpkin_seed_UI  = load_image("pumpkin_seed")
 
-left_button  = pygame.image.load(os.path.join(image_path, "arrow_left.png"))
-right_button  = pygame.image.load(os.path.join(image_path, "arrow_right.png"))
+wheat_1 = load_image("wheat_1")
+wheat_2 = load_image("wheat_2")
+wheat_3 = load_image("wheat_3")
+wheat_4 = load_image("wheat_4")
+wheat_seed_UI  = load_image("wheat_seed")
+
+left_button  = load_image("arrow_left")
+right_button  = load_image("arrow_right")
+
+posion  = load_image("posion_speed")
 
 
 # 이미지 크기
 worker_3_UI = pygame.transform.scale(worker_3, (worker_3.get_width() * 2, worker_3.get_height() * 2))
 worker_2_UI = pygame.transform.scale(worker_2, (worker_2.get_width() * 2, worker_2.get_height() * 2))
 worker_1_UI = pygame.transform.scale(worker_1, (worker_1.get_width() * 2, worker_1.get_height() * 2))
-Button_1_UI = pygame.transform.scale(Button_1, (Button_1.get_width() * 2, Button_1.get_height() * 2))
-Button_2_UI = pygame.transform.scale(Button_2, (Button_2.get_width() * 2, Button_2.get_height() * 2))
-Button_3_UI = pygame.transform.scale(Button_3, (Button_3.get_width() * 2, Button_3.get_height() * 2))
-Button_4_UI = pygame.transform.scale(Button_4, (Button_3.get_width() * 2, Button_3.get_height() * 2))
-Button_5_UI = pygame.transform.scale(Button_5, (Button_3.get_width() * 2, Button_3.get_height() * 2))
-Button_6_UI = pygame.transform.scale(Button_6, (Button_3.get_width() * 2, Button_3.get_height() * 2))
-Button_7_UI = pygame.transform.scale(Button_7, (Button_3.get_width() * 2, Button_3.get_height() * 2))
-Button_8_UI = pygame.transform.scale(Button_8, (Button_3.get_width() * 2, Button_3.get_height() * 2))
-Button_9_UI = pygame.transform.scale(Button_9, (Button_3.get_width() * 2, Button_3.get_height() * 2))
-Button_0_UI = pygame.transform.scale(Button_0, (Button_3.get_width() * 2, Button_3.get_height() * 2))
+# 숫자 버튼 크기 조절
+button_ui = [
+    pygame.transform.scale(img, (img.get_width() * 2, img.get_height() * 2))
+    for img in number_buttons
+]
+Button_0_UI, Button_1_UI, Button_2_UI, Button_3_UI, Button_4_UI, Button_5_UI, Button_6_UI, Button_7_UI, Button_8_UI, Button_9_UI = button_ui
 Button_f_UI = pygame.transform.scale(Button_f, (Button_f.get_width() * 2, Button_f.get_height() * 2))
 Button_space_UI = pygame.transform.scale(Button_space, (Button_space.get_width() * 2, Button_space.get_height() * 2))
 fish_UI = pygame.transform.scale(fish_png, (fish_png.get_width() //2 , fish_png.get_height() // 2))
@@ -210,6 +208,7 @@ wheat = data.get("wheat", 0)
 tomato_seed = data.get("tomato_seed", 0)
 pumpkin_seed = data.get("pumpkin_seed", 0)
 wheat_seed = data.get("wheat_seed", 0)
+god_message_jud = data.get("god", 0)
 
 
 # Font 정의
@@ -277,6 +276,7 @@ success_start_time = 0
 success_display = False
 elapsed = 10000
 fish_sound_jud = 0
+fountain_jud = 0
 
 # NPC 월드 좌표 (카메라와 분리)
 worker_3_world_x = 1500
@@ -315,7 +315,7 @@ background_sound.play(-1)
 # 메인 게임 루프
 running = True
 while running:
-    dt = clock.tick(144)  # FPS 설정 및 시간 기반 처리
+    dt = clock.tick(FPS)  # FPS 설정 및 시간 기반 처리
     now_ms = pygame.time.get_ticks()  # ✅ 프레임당 1회만 시간 읽기
 
     coin_text = game_font.render(str(coin), True, (255, 255, 255))
@@ -347,8 +347,8 @@ while running:
 
     # 식물 성장 시간 업데이트
     for i in range(len(plants_time)):
-        if plants_time[i] > 3:
-            plants_time[i] -= 4
+        if plants_time[i] > 0:
+            plants_time[i] -= 0.5
 
     # 체력 확인 및 게임 오버 처리
     if hp <= 0:
@@ -405,17 +405,20 @@ while running:
                                 inventory[seed_idx] -= 1
                                 inventory_text[seed_idx] = inventory_font.render(str(inventory[seed_idx]), True, (255, 255, 255))
                                 break
+                            
 
             # 낚시 / 상점 / 일 시작
             if event.key == pygame.K_f:
                 if background_y_pos < -900:
                     fish = 1
-                elif -365 < background_x_pos < -225 and background_y_pos > 2150:
+                elif -270 < background_x_pos < -400 and background_y_pos > 2125:
                     store_jud = 1
-                elif -665 < background_x_pos < -525 and background_y_pos > 2150:
+                elif -550 < background_x_pos < -680 and background_y_pos > 2125:
                     work_jud = 1
-                elif -965 < background_x_pos < -825 and background_y_pos > 2150:
+                elif -965 < background_x_pos < -825 and background_y_pos > 2125:
                     mini_game_jud = 1
+                elif -5750 < background_x_pos < -5555 and background_y_pos > 2125:
+                    fountain_jud = 1
 
             # 체력 회복
             if event.key == pygame.K_2:
@@ -695,8 +698,9 @@ while running:
     screen.blit(sand2, (int(background_x_pos + 1165), int(background_y_pos - 1800)))
     screen.blit(store, (int(background_x_pos + 1165), int(background_y_pos - 1800)))  # 가게
     screen.blit(sand2, (int(background_x_pos + 1465), int(background_y_pos - 1800)))
-    screen.blit(store, (int(background_x_pos + 1465), int(background_y_pos - 1800)))
+    screen.blit(work, (int(background_x_pos + 1465), int(background_y_pos - 1800)))
     screen.blit(mini_game_icon, (int(background_x_pos + 1765), int(background_y_pos - 1700)))
+    screen.blit(fountain, (int(background_x_pos + 6500), int(background_y_pos - 1800)))
 
     # 밭 그리기
     for d in range(field_num[1]):
@@ -804,7 +808,7 @@ while running:
         hp -= 0.5
         screen.blit(fish_tool, ((fish_x_pos - 30, fish_y_pos - 20)))
         pygame.display.update()
-        cul = 205
+        cul = 1000
         time.sleep(random.randint(1, 3))
         cul2 = 0
         fish_running = 1
@@ -838,9 +842,9 @@ while running:
             if cul4 + fish_x_pul < 250:
                 cul3 = 1
             if cul3 < 0:
-                fish_x_pul -= 100
+                fish_x_pul -= 15
             if cul3 > 0:
-                fish_x_pul += 100
+                fish_x_pul += 15
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
@@ -1316,6 +1320,10 @@ while running:
 
         screen.blit(play_button, (store_UI_x_pos - 50, store_UI_y_pos - store_UI_height / 2 + 600))
 
+        # 텍스트
+        text = UI_font.render("wasd키로 날아오는 비행기를 피하는 게임", True, (255, 255, 255))
+        screen.blit(text, (store_UI_x_pos - 350, store_UI_y_pos - store_UI_height / 2 + 150))
+
         # UI 위치 초기화
         store_UI_x_pos = 975
         store_UI_y_pos = 575
@@ -1332,6 +1340,45 @@ while running:
                         if inventory[3] > 0:
                                 mini_game_1 = 1
                                 inventory[3] -= 1
+
+    if fountain_jud == 1 and god_message_jud == 0:
+        store_UI_y_pos -= 100
+        screen.blit(store_UI, (store_UI_x_pos - store_UI_width / 2, store_UI_y_pos - store_UI_height / 2))
+        screen.blit(store_ESC, (store_UI_x_pos - store_UI_width / 2, store_UI_y_pos - store_UI_height / 2))
+        store_UI_x_pos -= 90
+        store_UI_y_pos -= 50
+
+        # 아이템 아이콘 표시
+        screen.blit(posion, (store_UI_x_pos , store_UI_y_pos - store_UI_height / 2 + 375))
+        screen.blit(wheat_4, (store_UI_x_pos, store_UI_y_pos - store_UI_height / 2 + 500))
+        screen.blit(do_button, (store_UI_x_pos - 75, store_UI_y_pos - store_UI_height / 2 + 700))
+
+        # 텍스트
+        sum = inventory_font.render("x 100", True, (255, 255, 255))
+        text = UI_font.render("밀 100개 공양 하면 스피드 물약을 하사하노라", True, (255, 255, 0))
+        screen.blit(sum, (store_UI_x_pos + 100, store_UI_y_pos - store_UI_height / 2 + 500))
+        screen.blit(text, (store_UI_x_pos  - 450, store_UI_y_pos - store_UI_height / 2 + 250))
+
+        # UI 위치 초기화
+        store_UI_x_pos = 975
+        store_UI_y_pos = 575
+
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:  # 마우스 클릭 누를 때
+                # 워크 UI 클릭 감지
+                if store_UI_x_pos - store_UI_width / 2 < pygame.mouse.get_pos()[0] < store_UI_x_pos - store_UI_width / 2 + 100:
+                    if store_UI_y_pos - store_UI_height / 2 - 100 < pygame.mouse.get_pos()[1] < store_UI_y_pos - store_UI_height / 2:
+                        fountain_jud = 0
+
+                if 815 < pygame.mouse.get_pos()[0] < 1115:  # buy 영역
+                    if 700 < pygame.mouse.get_pos()[1] < 850:
+                        if inventory[9] > 99:
+                                mini_game_1 = 0
+                                god_message_jud = 1
+                                inventory[9] -= 100
+    elif (god_message_jud == 1): 
+        text = UI_font.render("공양해 주어서 고맙구나 나의 형제여", True, (255, 255, 0))
+        screen.blit(text, (int(background_x_pos + 6250), int(background_y_pos - 1850)))
 
     screen.blit(coin_png, (1550, 10))  # 코인 그리기
     screen.blit(coin_text, (1650, 20))  # 코인 갯수 표시
@@ -1376,6 +1423,7 @@ data = {
     "wheat" : inventory[9],
     "wheat_seed" : inventory[8],
     "jud" : 0,
+    "god" : god_message_jud,
 }
 with open(save_file, "w", encoding="utf8") as f:
     json.dump(data, f, ensure_ascii=False, indent=4)
