@@ -218,6 +218,8 @@ gameover_font = pygame.font.Font(pixel_pont_path, 100)
 inventory_font = pygame.font.Font(pixel_pont_path, 25)
 UI_font = pygame.font.Font(pixel_pont_path, 50)
 gameover_text = gameover_font.render(str("[피로도에 의해 캐릭터가 기절했습니다.]"), True, (255, 0, 0))
+gameover_text2 = gameover_font.render(str("코인 1000개가 차감됩니다."), True, (255, 0, 0))
+gameover_text3 = gameover_font.render(str("hp 50이 회복됩니다."), True, (255, 0, 0))
 succes_text = game_font.render(str("성공!"), True, (255, 255, 255))
 UI_key_pont = pygame.font.Font(pixel_pont_path, 25)
 
@@ -274,6 +276,7 @@ store_index = 0
 success_start_time = 0
 success_display = False
 elapsed = 10000
+fish_sound_jud = 0
 
 # NPC 월드 좌표 (카메라와 분리)
 worker_3_world_x = 1500
@@ -305,6 +308,8 @@ SEED_STOCK = 5
 
 # 배경음악
 background_sound = pygame.mixer.Sound(os.path.join(music_path, "background.mp3"))
+coin_sound = pygame.mixer.Sound(os.path.join(music_path, "coin.mp3"))
+water_splash_sound = pygame.mixer.Sound(os.path.join(music_path, "water_splash.mp3"))
 background_sound.play(-1)
 
 # 메인 게임 루프
@@ -415,7 +420,7 @@ while running:
             # 체력 회복
             if event.key == pygame.K_2:
                 if inventory[1] >= 1 and hp < 100:
-                    hp += 1
+                    hp += 4
                     inventory[1] -= 1
             elif event.key == pygame.K_3:
                 if inventory[2] >= 1 and hp < 100:
@@ -427,11 +432,11 @@ while running:
                     inventory[5] -= 1
             elif event.key == pygame.K_0:
                 if inventory[9] >= 1 and hp < 100:
-                    hp += 5
+                    hp += 1
                     inventory[9] -= 1
             elif event.key == pygame.K_8:
                 if inventory[7] >= 1 and hp < 100:
-                    hp += 10
+                    hp += 0.5
                     inventory[7] -= 1
 
         if event.type == pygame.KEYUP:
@@ -865,11 +870,15 @@ while running:
             screen.blit(fish_gage_bar_select, ((cul4 + fish_x_pul, fish_y_pos + 300)))
             cul2 += 1
             cul -= 1
+            if (fish_sound_jud == 0):
+                water_splash_sound.play(-1)
+                fish_sound_jud = 1
             pygame.display.update()
-            time.sleep(0.001)
+        water_splash_sound.stop()
         fish = 0
         cul2 = 0
         fish_x_pul = 0
+        fish_sound_jud = 0
 
     if fish_point == 1:
         success_display = True
@@ -982,6 +991,12 @@ while running:
             field_buy_text = inventory_font.render(field_price, True, (255, 255, 255))
             ticket_buy_text = inventory_font.render("500 coin", True, (255, 255, 255))
 
+            flower_text = inventory_font.render("먹으면 체력을 4만큼 회복한다. 맛있어 보인다", True, (255, 255, 255))
+            flower_seed_text = inventory_font.render("심으면 감자가 자란다", True, (255, 255, 255))
+            fish_text = inventory_font.render("먹으면 체력을 5만큼 회복한다. 매우 맛있어 보인다", True, (255, 255, 255))
+            field_text = inventory_font.render("밭이 가로 또는 세로로 한칸 늘어난다", True, (255, 255, 255))
+            ticket_text = inventory_font.render("이걸로 오락 한판을 할 수 있다. 재미있겠다", True, (255, 255, 255))
+
             # 구매 및 판매 UI 그리기
             for i in range(3):  # 꽃, 씨앗, 물고기
                 screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
@@ -995,13 +1010,18 @@ while running:
 
             # 가격 텍스트 표시
             screen.blit(flower_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 180))
+            screen.blit(flower_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 150))
             screen.blit(flower_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 180))
             screen.blit(seed_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 430))
+            screen.blit(flower_seed_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 400))
             screen.blit(seed_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 430))
+            screen.blit(fish_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 650))
             screen.blit(fish_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 680))
+            screen.blit(field_text, (store_UI_x_pos - store_UI_width / 2 + 1210, store_UI_y_pos - store_UI_height / 2 + 150))
             screen.blit(fish_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 680))
             screen.blit(field_buy_text, (store_UI_x_pos - store_UI_width / 2 + 1210, store_UI_y_pos - store_UI_height / 2 + 180))
             screen.blit(ticket_buy_text, (store_UI_x_pos - store_UI_width / 2 + 1210, store_UI_y_pos - store_UI_height / 2 + 430))
+            screen.blit(ticket_text, (store_UI_x_pos - store_UI_width / 2 + 1100, store_UI_y_pos - store_UI_height / 2 + 400))
             
         else:
             screen.blit(left_button, (store_UI_x_pos - store_UI_width / 2 - 50, store_UI_y_pos - store_UI_height / 2 + 200 + 275))
@@ -1026,6 +1046,13 @@ while running:
             pumpkin_seed_buy_text = inventory_font.render("100 coin", True, (255, 255, 255))
             pumpkin_seed_sell_text = inventory_font.render("90 coin", True, (255, 255, 255))
 
+            tomato_text = inventory_font.render("먹으면 체력을 3만큼 회복한다. 먹음직스럽게 생겼다", True, (255, 255, 255))
+            tomato_seed_text = inventory_font.render("심으면 토마토가 자란다", True, (255, 255, 255))
+            wheat_text = inventory_font.render("먹으면 체력을 1만큼 회복한다. 그리 맛있게 생기진 않았다", True, (255, 255, 255))
+            wheat_seed_text = inventory_font.render("심으면 밀이 자란다", True, (255, 255, 255))
+            pumpkin_text = inventory_font.render("먹으면 체력을 0.5만큼 회복한다. 딱딱한데 먹을 수 있을지는 미지수이다", True, (255, 255, 255))
+            wheat_seed_text = inventory_font.render("심으면 호박이 자란다", True, (255, 255, 255))
+
             # 구매 및 판매 UI 그리기
             for i in range(3):  # 꽃, 씨앗, 물고기
                 screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
@@ -1042,17 +1069,23 @@ while running:
 
             # 가격 텍스트 표시
             screen.blit(tomato_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 180))
+            screen.blit(tomato_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 150))
             screen.blit(tomato_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 180))
             screen.blit(tomato_seed_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 430))
+            screen.blit(tomato_seed_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 400))
             screen.blit(tomato_seed_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 430))
             screen.blit(wheat_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 680))
+            screen.blit(wheat_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 650))
             screen.blit(wheat_sell_text, (store_UI_x_pos - store_UI_width / 2 + 510, store_UI_y_pos - store_UI_height / 2 + 680))
 
             screen.blit(wheat_seed_buy_text, (store_UI_x_pos - store_UI_width / 2 + 910, store_UI_y_pos - store_UI_height / 2 + 180))
+            screen.blit(wheat_text, (store_UI_x_pos - store_UI_width / 2 + 910, store_UI_y_pos - store_UI_height / 2 + 150))
             screen.blit(wheat_seed_sell_text, (store_UI_x_pos - store_UI_width / 2 + 1220, store_UI_y_pos - store_UI_height / 2 + 180))
             screen.blit(pumpkin_buy_text, (store_UI_x_pos - store_UI_width / 2 + 910, store_UI_y_pos - store_UI_height / 2 + 430))
+            screen.blit(pumpkin_text, (store_UI_x_pos - store_UI_width / 2 + 800, store_UI_y_pos - store_UI_height / 2 + 400))
             screen.blit(pumpkin_sell_text, (store_UI_x_pos - store_UI_width / 2 + 1220, store_UI_y_pos - store_UI_height / 2 + 430))
             screen.blit(pumpkin_seed_buy_text, (store_UI_x_pos - store_UI_width / 2 + 910, store_UI_y_pos - store_UI_height / 2 + 680))
+            screen.blit(wheat_seed_text, (store_UI_x_pos - store_UI_width / 2 + 910, store_UI_y_pos - store_UI_height / 2 + 650))
             screen.blit(pumpkin_seed_sell_text, (store_UI_x_pos - store_UI_width / 2 + 1220, store_UI_y_pos - store_UI_height / 2 + 680))
         
         # UI 위치 초기화
@@ -1080,14 +1113,17 @@ while running:
                                     if coin >= 50:
                                         inventory[1] += 1
                                         coin -= 50
+                                        coin_sound.play(0)
                                 elif cul == 1:  # 씨앗
                                     if coin >= 10:
                                         inventory[0] += 1
                                         coin -= 10
+                                        coin_sound.play(0)
                                 elif cul == 2:  # 물고기
                                     if coin >= 200:
                                         inventory[2] += 1
                                         coin -= 200
+                                        coin_sound.play(0)
 
                         elif 600 < pygame.mouse.get_pos()[0] < 900:  # sell 영역
                             if cul * 250 + 200 < pygame.mouse.get_pos()[1] < cul * 250 + 350:
@@ -1095,14 +1131,17 @@ while running:
                                     if inventory[1] >= 1:
                                         inventory[1] -= 1
                                         coin += 30
+                                        coin_sound.play(0)
                                 elif cul == 1:  # 씨앗
                                     if inventory[0] >= 1:
                                         inventory[0] -= 1
                                         coin += 5
+                                        coin_sound.play(0)
                                 elif cul == 2:  # 물고기
                                     if inventory[2] >= 1:
                                         inventory[2] -= 1
                                         coin += 100
+                                        coin_sound.play(0)
 
                     # 땅 구매 처리
                     if 1300 < pygame.mouse.get_pos()[0] < 1600:  # buy 영역
@@ -1111,16 +1150,19 @@ while running:
                                 if field_num[1] * 500 <= coin:
                                     coin -= field_num[1] * 500
                                     field_num[0] += 1
+                                    coin_sound.play(0)
                             else:
                                 if field_num[0] * 500 <= coin:
                                     coin -= field_num[1] * 500
                                     field_num[1] += 1
+                                    coin_sound.play(0)
 
                     if 1300 < pygame.mouse.get_pos()[0] < 1600:  # buy 영역
                         if 450 < pygame.mouse.get_pos()[1] < 550:  # ticket
                             if coin >= 500:
                                         inventory[3] += 1
                                         coin -= 500
+                                        coin_sound.play(0)
                 
                 else:
                     for cul in range(3):
@@ -1130,14 +1172,17 @@ while running:
                                     if coin >= 100:
                                         inventory[5] += 1
                                         coin -= 100
+                                        coin_sound.play(0)
                                 elif cul == 1:
                                     if coin >= 20:
                                         inventory[4] += 1
                                         coin -= 20
+                                        coin_sound.play(0)
                                 elif cul == 2:
                                     if coin >= 200:
                                         inventory[9] += 1
                                         coin -= 200
+                                        coin_sound.play(0)
 
                         elif 600 < pygame.mouse.get_pos()[0] < 900:  # sell 영역
                             if cul * 250 + 200 < pygame.mouse.get_pos()[1] < cul * 250 + 350:
@@ -1145,14 +1190,17 @@ while running:
                                     if inventory[5] >= 1:
                                         inventory[5] -= 1
                                         coin += 90
+                                        coin_sound.play(0)
                                 elif cul == 1:
                                     if inventory[4] >= 1:
                                         inventory[4] -= 1
                                         coin += 15
+                                        coin_sound.play(0)
                                 elif cul == 2:
                                     if inventory[9] >= 1:
                                         inventory[9] -= 1
                                         coin += 100
+                                        coin_sound.play(0)
 
                     for cul in range(3):
                         if 1010 < pygame.mouse.get_pos()[0] < 1310:  # buy 영역
@@ -1200,8 +1248,11 @@ while running:
 
         # 가격 텍스트 생성
         worker_3_buy = inventory_font.render("1000 coin", True, (255, 255, 255))
+        worker_3 = inventory_font.render("자동으로 농사해주는 로봇이다. 하지만 감자밖에 못심고 느리다.", True, (255, 255, 255))
         worker_2_buy = inventory_font.render("5000 coin", True, (255, 255, 255))
+        worker_2 = inventory_font.render("자동으로 농사해주는 로봇이다. 감자밖에 못심지만 빠르다.", True, (255, 255, 255))
         worker_1_buy = inventory_font.render("15000 coin", True, (255, 255, 255))
+        worker_1 = inventory_font.render("자동으로 낚시해주는 로봇이다.", True, (255, 255, 255))
 
         # 구매 UI 그리기
         if (worker_3_jud == 0):
@@ -1218,8 +1269,11 @@ while running:
             screen.blit(store_UI_unbuy, (store_UI_x_pos - store_UI_width / 2 + 190, store_UI_y_pos - store_UI_height / 2 + 200 + 500))
         # 가격 텍스트 표시
         screen.blit(worker_3_buy, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 180))
+        screen.blit(worker_3, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 150))
         screen.blit(worker_2_buy, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 200 + 230))
+        screen.blit(worker_2, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 200 + 200))
         screen.blit(worker_1_buy, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 200 + 480))
+        screen.blit(worker_1, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 200 + 450))
 
         # UI 위치 초기화
         store_UI_x_pos = 975
@@ -1273,7 +1327,7 @@ while running:
                     if store_UI_y_pos - store_UI_height / 2 - 100 < pygame.mouse.get_pos()[1] < store_UI_y_pos - store_UI_height / 2:
                         mini_game_jud = 0
 
-                if 315 < pygame.mouse.get_pos()[0] < 600:  # buy 영역
+                if 845 < pygame.mouse.get_pos()[0] < 1145:  # buy 영역
                     if 600 < pygame.mouse.get_pos()[1] < 750:
                         if inventory[3] > 0:
                                 mini_game_1 = 1
@@ -1283,9 +1337,11 @@ while running:
     screen.blit(coin_text, (1650, 20))  # 코인 갯수 표시
     if gameover_sig == 1:  # 게임오버 표시
         screen.blit(gameover, (0, 0))
-        screen.blit(gameover_text, (50, 450))
+        screen.blit(gameover_text, (25, 450))
+        screen.blit(gameover_text2, (300, 550))
+        screen.blit(gameover_text3, (400, 650))
         hp += 50
-        coin -= 100
+        coin -= 1000
         pygame.display.update()
         time.sleep(3)
         gameover_sig = 0
@@ -1319,6 +1375,7 @@ data = {
     "pumpkin_seed" : inventory[6],
     "wheat" : inventory[9],
     "wheat_seed" : inventory[8],
+    "jud" : 0,
 }
 with open(save_file, "w", encoding="utf8") as f:
     json.dump(data, f, ensure_ascii=False, indent=4)

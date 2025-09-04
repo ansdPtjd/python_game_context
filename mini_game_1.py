@@ -142,7 +142,7 @@ while running:
     screen.blit(character, (character_x_pos, character_y_pos))
     for e in enemies:
         screen.blit(e["img"], e["rect"].topleft)
-    score_text = score_font.render(str(score), True, (0, 0, 0))
+    score_text = score_font.render(str(score + "점"), True, (0, 0, 0))
     screen.blit(score_text, (600, 0))
     pygame.display.update()
 
