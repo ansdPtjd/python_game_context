@@ -121,7 +121,6 @@ right_button  = load_image("arrow_right")
 
 posion  = load_image("posion_speed")
 
-
 # 이미지 크기
 worker_3_UI = pygame.transform.scale(worker_3, (worker_3.get_width() * 2, worker_3.get_height() * 2))
 worker_2_UI = pygame.transform.scale(worker_2, (worker_2.get_width() * 2, worker_2.get_height() * 2))
@@ -209,6 +208,9 @@ tomato_seed = data.get("tomato_seed", 0)
 pumpkin_seed = data.get("pumpkin_seed", 0)
 wheat_seed = data.get("wheat_seed", 0)
 god_message_jud = data.get("god", 0)
+if god_message_jud == 1:
+    speed = 1.5
+bed_jud = data.get("bed", 0)
 
 
 # Font 정의
@@ -221,6 +223,7 @@ gameover_text2 = gameover_font.render(str("코인 1000개가 차감됩니다."),
 gameover_text3 = gameover_font.render(str("hp 50이 회복됩니다."), True, (255, 0, 0))
 succes_text = game_font.render(str("성공!"), True, (255, 255, 255))
 UI_key_pont = pygame.font.Font(pixel_pont_path, 25)
+coin_text = game_font.render(str(coin), True, (255, 255, 255))
 
 # 리스트
 field_num = [field_x, field_y]
@@ -277,6 +280,11 @@ success_display = False
 elapsed = 10000
 fish_sound_jud = 0
 fountain_jud = 0
+if god_message_jud == 1:
+    speed = 1.5
+else:
+    speed = 1
+house_jud = 0
 
 # NPC 월드 좌표 (카메라와 분리)
 worker_3_world_x = 1500
@@ -317,8 +325,6 @@ running = True
 while running:
     dt = clock.tick(FPS)  # FPS 설정 및 시간 기반 처리
     now_ms = pygame.time.get_ticks()  # ✅ 프레임당 1회만 시간 읽기
-
-    coin_text = game_font.render(str(coin), True, (255, 255, 255))
 
     if mini_game_1 == 1:
         # 미니게임 실행 (끝날 때까지 기다림)
@@ -376,13 +382,13 @@ while running:
 
             # 캐릭터 이동
             if event.key == pygame.K_a:
-                to_x += background_speed
+                to_x += background_speed * speed
             elif event.key == pygame.K_d:
-                to_x -= background_speed
+                to_x -= background_speed * speed
             elif event.key == pygame.K_w:
-                to_y += background_speed
+                to_y += background_speed * speed
             elif event.key == pygame.K_s:
-                to_y -= background_speed
+                to_y -= background_speed * speed
 
             # 작물 심기 (플레이어 수동)
             if event.key in [pygame.K_1, pygame.K_5, pygame.K_7, pygame.K_9]:
@@ -411,7 +417,7 @@ while running:
             if event.key == pygame.K_f:
                 if background_y_pos < -900:
                     fish = 1
-                elif -270 < background_x_pos < -400 and background_y_pos > 2125:
+                elif -400 < background_x_pos < -270 and background_y_pos > 2125:
                     store_jud = 1
                 elif -550 < background_x_pos < -680 and background_y_pos > 2125:
                     work_jud = 1
@@ -419,6 +425,8 @@ while running:
                     mini_game_jud = 1
                 elif -5750 < background_x_pos < -5555 and background_y_pos > 2125:
                     fountain_jud = 1
+                elif -125 < background_x_pos <= 0 and background_y_pos > 2125:
+                    house_jud = 1
 
             # 체력 회복
             if event.key == pygame.K_2:
@@ -925,7 +933,7 @@ while running:
         screen.blit(K_1_text, (1700, 850))
         screen.blit(Button_f_UI, (1650, 847.5))
     
-    if (-365 < background_x_pos < -225 and background_y_pos > 2150):
+    if (-400 < background_x_pos < -270 and background_y_pos > 2125):
         K_1_text = UI_key_pont.render(str(": 상점"), True, (0, 0, 0))
         screen.blit(K_1_text, (1700, 850))
         screen.blit(Button_f_UI, (1650, 847.5))
@@ -937,6 +945,16 @@ while running:
 
     if (-965 < background_x_pos < -825 and background_y_pos > 2150):    
         K_1_text = UI_key_pont.render(str(": 오락실"), True, (0, 0, 0))
+        screen.blit(K_1_text, (1700, 850))
+        screen.blit(Button_f_UI, (1650, 847.5))
+
+    if (-5750 < background_x_pos < -5555 and background_y_pos > 2125):    
+        K_1_text = UI_key_pont.render(str(": 분수대"), True, (0, 0, 0))
+        screen.blit(K_1_text, (1700, 850))
+        screen.blit(Button_f_UI, (1650, 847.5))
+
+    if (-125 < background_x_pos <= 0 and background_y_pos > 2125):    
+        K_1_text = UI_key_pont.render(str(": 집"), True, (0, 0, 0))
         screen.blit(K_1_text, (1700, 850))
         screen.blit(Button_f_UI, (1650, 847.5))
 
@@ -1376,9 +1394,38 @@ while running:
                                 mini_game_1 = 0
                                 god_message_jud = 1
                                 inventory[9] -= 100
+                                speed += 0.5
     elif (god_message_jud == 1): 
-        text = UI_font.render("공양해 주어서 고맙구나 나의 형제여", True, (255, 255, 0))
-        screen.blit(text, (int(background_x_pos + 6250), int(background_y_pos - 1850)))
+        text = UI_font.render("신이 떠나감", True, (255, 255, 0))
+        screen.blit(text, (int(background_x_pos + 6500), int(background_y_pos - 1850)))
+
+    if house_jud == 1:
+        pygame.display.quit()  
+
+        # 1) house.py 실행 (hp, bed_jud 전달)
+        subprocess.run([sys.executable, "house.py", str(int(hp)), str(int(bed_jud))])
+
+        # 2) house.py 종료 후 hp.tmp 읽기
+        if os.path.exists("hp.tmp"):
+            with open("hp.tmp", "r") as f:
+                try:
+                    # house.py가 "hp bed_jud" 두 값 저장했다고 가정
+                    parts = f.read().strip().split()
+                    if len(parts) >= 1:
+                        hp = max(0, min(100, int(float(parts[0]))))
+                    if len(parts) >= 2:
+                        bed_jud = int(parts[1])
+                except ValueError:
+                    pass
+            os.remove("hp.tmp")
+
+        # 3) 다시 창 열고 이어서 진행
+        pygame.display.init()                                  # ⬅️ display만 다시 켠다
+        screen = pygame.display.set_mode((screen_width, screen_height))
+        pygame.display.set_caption("Horizon")
+        house_jud = 0
+
+
 
     screen.blit(coin_png, (1550, 10))  # 코인 그리기
     screen.blit(coin_text, (1650, 20))  # 코인 갯수 표시
@@ -1424,6 +1471,7 @@ data = {
     "wheat_seed" : inventory[8],
     "jud" : 0,
     "god" : god_message_jud,
+    "bed" : bed_jud
 }
 with open(save_file, "w", encoding="utf8") as f:
     json.dump(data, f, ensure_ascii=False, indent=4)
