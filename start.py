@@ -71,18 +71,58 @@ def main():
             "field_x": 3,
             "field_y": 3,
             "hp": 100,
-            "plants_time": [0],
-            "plants_seat": [0],
+            "plants_time": [
+                0
+            ],
+            "plants_seat": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
             "worker_3_jud": 0,
-            "worker_3_seed": 0,
-            "worker_3_flower": 0,
+            "worker_3_seed": [
+                0,
+                0,
+                0,
+                0
+            ],
+            "worker_3_flower": [
+                0,
+                0,
+                0,
+                0
+            ],
             "worker_2_jud": 0,
-            "worker_2_seed": 0,
-            "worker_2_flower": 0,
+            "worker_2_seed": [
+                0,
+                0,
+                0,
+                0
+            ],
+            "worker_2_flower": [
+                0,
+                0,
+                0,
+                0
+            ],
             "worker_1_jud": 0,
             "worker_1_fish": 0,
-            "ticket" : 0,
-            "jud" : 0
+            "ticket": 0,
+            "tomato": 0,
+            "tomato_seed": 0,
+            "pumpkin": 0,
+            "pumpkin_seed": 0,
+            "wheat": 0,
+            "wheat_seed": 0,
+            "jud": 0,
+            "god": 0,
+            "bed": 0
         }
         with open(save_file, "w", encoding="utf8") as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
@@ -97,19 +137,59 @@ def main():
             "field_x": 3,
             "field_y": 3,
             "hp": 100,
-            "plants_time": [0],
-            "plants_seat": [0],
+            "plants_time": [
+                0
+            ],
+            "plants_seat": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
             "worker_3_jud": 0,
-            "worker_3_seed": 0,
-            "worker_3_flower": 0,
+            "worker_3_seed": [
+                0,
+                0,
+                0,
+                0
+            ],
+            "worker_3_flower": [
+                0,
+                0,
+                0,
+                0
+            ],
             "worker_2_jud": 0,
-            "worker_2_seed": 0,
-            "worker_2_flower": 0,
+            "worker_2_seed": [
+                0,
+                0,
+                0,
+                0
+            ],
+            "worker_2_flower": [
+                0,
+                0,
+                0,
+                0
+            ],
             "worker_1_jud": 0,
             "worker_1_fish": 0,
-            "ticket" : 0,
-            "jud" : 1
-        }
+            "ticket": 0,
+            "tomato": 0,
+            "tomato_seed": 0,
+            "pumpkin": 0,
+            "pumpkin_seed": 0,
+            "wheat": 0,
+            "wheat_seed": 0,
+            "jud": 1,
+            "god": 0,
+            "bed": 0
+                }
         with open(save_file, "w", encoding="utf8") as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
 
