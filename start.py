@@ -1,4 +1,4 @@
-# start.py
+          
 import sys
 import subprocess
 import pygame
@@ -27,7 +27,7 @@ else:
     data = {}
 jud = data.get("jud", 0)
 
-# 배경 이미지 로드
+           
 background = pygame.image.load(os.path.join(image_path, "Horizon.png"))
 
 def main():
@@ -35,13 +35,13 @@ def main():
     screen = pygame.display.set_mode((1280, 720))
     pygame.display.set_caption("Horizon")
 
-    # 폰트 객체 생성 (폰트가 없으면 기본 폰트로 폴백)
+                                  
     try:
         game_font = pygame.font.Font(pixel_pont_path, 28)
     except Exception:
         game_font = pygame.font.SysFont(None, 28)
 
-    # 안내 텍스트
+            
     button_text = game_font.render("touch to start", True, (255, 255, 255))
 
     running = True
@@ -52,12 +52,12 @@ def main():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 running = False
 
-        # 배경 + 텍스트 그리기
+                      
         screen.blit(background, (0, 0))
         screen.blit(button_text, (540, 690))
         pygame.display.update()
 
-    # 인트로 창 닫기
+              
     pygame.quit()
 
     if (jud == 1):
