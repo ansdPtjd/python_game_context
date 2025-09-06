@@ -108,7 +108,7 @@ while running:
                 to_y += speed
 
             if event.key == pygame.K_f:
-                if (0 <= character_x_pos <= 90 and 400 <= character_y_pos <= 600):
+                if (0 <= character_x_pos <= 90 and 700 >= character_y_pos >= 500):
                     sleeping = True
                     fade_direction = 1   # 화면 어둡게
                     fade_alpha = 0
@@ -134,7 +134,7 @@ while running:
     pygame.draw.rect(screen, (0, 0, 0), (character_x_pos - (maxhp / 2.9) + 15, character_y_pos - 30, maxhp, 15))
     pygame.draw.rect(screen, (255, 0, 0), (character_x_pos - (maxhp / 3.2) + 15, character_y_pos - 27.5, start_hp - 5, 10))
 
-    if (0 <= character_x_pos <= 90 and 600 >= character_y_pos >= 400) and bed_jud == 1:    
+    if (0 <= character_x_pos <= 90 and 700 >= character_y_pos >= 500) and bed_jud == 1:    
         K_1_text = UI_key_pont.render(str(": 잠자기"), True, (0, 0, 0))
         screen.blit(K_1_text, (800, (screen_height / 2) + (character_height / 2 + 300)))
         screen.blit(Button_f_UI, (750, (screen_height / 2) + (character_height / 2 + 300)))

@@ -119,7 +119,9 @@ wheat_seed_UI  = load_image("wheat_seed")
 left_button  = load_image("arrow_left")
 right_button  = load_image("arrow_right")
 
-posion  = load_image("posion_speed")
+posion = load_image("posion_speed")
+bed = load_image("bed")
+lightning = load_image("lightning")
 
 # 이미지 크기
 worker_3_UI = pygame.transform.scale(worker_3, (worker_3.get_width() * 2, worker_3.get_height() * 2))
@@ -136,6 +138,7 @@ Button_space_UI = pygame.transform.scale(Button_space, (Button_space.get_width()
 fish_UI = pygame.transform.scale(fish_png, (fish_png.get_width() //2 , fish_png.get_height() // 2))
 seed_UI = pygame.transform.scale(seed_png, (seed_png.get_width() //2 , seed_png.get_height() // 2))
 flower_UI = pygame.transform.scale(flower_dic4, (seed_png.get_width() //2 , seed_png.get_height() // 2))
+bed = pygame.transform.scale(bed, (bed.get_width() // 2 , bed.get_height() // 2))
 
 # 작물 타입 정의
 PLANT_NONE = 0
@@ -325,6 +328,7 @@ running = True
 while running:
     dt = clock.tick(FPS)  # FPS 설정 및 시간 기반 처리
     now_ms = pygame.time.get_ticks()  # ✅ 프레임당 1회만 시간 읽기
+    coin_text = game_font.render(str(coin), True, (255, 255, 255))
 
     if mini_game_1 == 1:
         # 미니게임 실행 (끝날 때까지 기다림)
@@ -983,6 +987,10 @@ while running:
         screen.blit(K_1_text, (1700, 547))
         screen.blit(Button_0_UI, (1650, 547.5))
 
+    if (speed == 1.5):
+        K_1_text = UI_key_pont.render(str("신속한 상태"), True, (50, 100, 255))
+        screen.blit(K_1_text, (1750, 300))
+
     cul = 0
     if store_jud == 1:
         
@@ -1001,6 +1009,7 @@ while running:
             screen.blit(fish_png, (store_UI_x_pos - store_UI_width / 2 + 90, store_UI_y_pos - store_UI_height / 2 + 730))
             screen.blit(field_png, (store_UI_x_pos - store_UI_width / 2 + 1000, store_UI_y_pos - store_UI_height / 2 + 230))
             screen.blit(ticket_UI, (store_UI_x_pos - store_UI_width / 2 + 1000, store_UI_y_pos - store_UI_height / 2 + 505))
+            screen.blit(bed, (store_UI_x_pos - store_UI_width / 2 + 1000, store_UI_y_pos - store_UI_height / 2 + 700))
 
             # 가격 텍스트 생성
             flower_buy_text = inventory_font.render("50 coin", True, (255, 255, 255))
@@ -1012,12 +1021,14 @@ while running:
             field_price = str(field_num[1] * 500) + " coin"
             field_buy_text = inventory_font.render(field_price, True, (255, 255, 255))
             ticket_buy_text = inventory_font.render("500 coin", True, (255, 255, 255))
+            bed_buy_text = inventory_font.render("5000 coin", True, (255, 255, 255))
 
             flower_text = inventory_font.render("먹으면 체력을 4만큼 회복한다. 맛있어 보인다", True, (255, 255, 255))
             flower_seed_text = inventory_font.render("심으면 감자가 자란다", True, (255, 255, 255))
             fish_text = inventory_font.render("먹으면 체력을 5만큼 회복한다. 매우 맛있어 보인다", True, (255, 255, 255))
             field_text = inventory_font.render("밭이 가로 또는 세로로 한칸 늘어난다", True, (255, 255, 255))
             ticket_text = inventory_font.render("이걸로 오락 한판을 할 수 있다. 재미있겠다", True, (255, 255, 255))
+            bed_text = inventory_font.render("집에 침대가 설치된다. 침대에서 자면 hp100이된다.", True, (255, 255, 255))
 
             # 구매 및 판매 UI 그리기
             for i in range(3):  # 꽃, 씨앗, 물고기
@@ -1029,7 +1040,10 @@ while running:
             # 땅 구매 UI
             screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 1200, store_UI_y_pos - store_UI_height / 2 + 200 + cul * 250))
             screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 1200, store_UI_y_pos - store_UI_height / 2 + 200 + 250))
-
+            if (bed_jud == 0):    
+                screen.blit(store_UI_buy, (store_UI_x_pos - store_UI_width / 2 + 1200, store_UI_y_pos - store_UI_height / 2 + 200 + 500))
+            else:
+                screen.blit(store_UI_unbuy, (store_UI_x_pos - store_UI_width / 2 + 1200, store_UI_y_pos - store_UI_height / 2 + 200 + 500))
             # 가격 텍스트 표시
             screen.blit(flower_buy_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 180))
             screen.blit(flower_text, (store_UI_x_pos - store_UI_width / 2 + 200, store_UI_y_pos - store_UI_height / 2 + 150))
@@ -1044,6 +1058,8 @@ while running:
             screen.blit(field_buy_text, (store_UI_x_pos - store_UI_width / 2 + 1210, store_UI_y_pos - store_UI_height / 2 + 180))
             screen.blit(ticket_buy_text, (store_UI_x_pos - store_UI_width / 2 + 1210, store_UI_y_pos - store_UI_height / 2 + 430))
             screen.blit(ticket_text, (store_UI_x_pos - store_UI_width / 2 + 1100, store_UI_y_pos - store_UI_height / 2 + 400))
+            screen.blit(bed_buy_text, (store_UI_x_pos - store_UI_width / 2 + 1210, store_UI_y_pos - store_UI_height / 2 + 680))
+            screen.blit(bed_text, (store_UI_x_pos - store_UI_width / 2 + 1050, store_UI_y_pos - store_UI_height / 2 + 650))
             
         else:
             screen.blit(left_button, (store_UI_x_pos - store_UI_width / 2 - 50, store_UI_y_pos - store_UI_height / 2 + 200 + 275))
@@ -1184,6 +1200,13 @@ while running:
                             if coin >= 500:
                                         inventory[3] += 1
                                         coin -= 500
+                                        coin_sound.play(0)
+
+                    if 1300 < pygame.mouse.get_pos()[0] < 1600:  # buy 영역
+                        if 700 < pygame.mouse.get_pos()[1] < 850:  # ticket
+                            if coin >= 5000 and bed_jud == 0:
+                                        bed_jud = 1
+                                        coin -= 5000
                                         coin_sound.play(0)
                 
                 else:
@@ -1428,6 +1451,7 @@ while running:
 
 
     screen.blit(coin_png, (1550, 10))  # 코인 그리기
+    
     screen.blit(coin_text, (1650, 20))  # 코인 갯수 표시
     if gameover_sig == 1:  # 게임오버 표시
         screen.blit(gameover, (0, 0))
